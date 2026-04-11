@@ -888,7 +888,6 @@
                 "VM.ASM",
                 "VM.PENTEST",
                 "VM.VULN-SCANNER",
-                "VM.ASM",
                 "ext-value"
             ],
             "description": "Possible analyzer category"
