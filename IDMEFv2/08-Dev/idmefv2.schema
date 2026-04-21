@@ -1,0 +1,1250 @@
+{
+    "description": "JSON schema for the Intrusion Detection Message Exchange Format (IDMEF) version 2 (revision 2.D.V08-Dev)",
+    "properties": {
+        "Version": {
+            "description": "The version of the IDMEF format in use by this alert. During the drafts tuning period the version is equal to the draft version. Therefore it is \"2.D.V0X\" for Draft V0X.",
+            "enum": [
+                "2.D.V08-Dev"
+            ]
+        },
+        "ID": {
+            "description": "Unique identifier for the alert.",
+            "$ref": "#/definitions/uuidType"
+        },
+        "OrganisationName": {
+            "description": "Corporate/Main Office Organisation Name Useful if alerts are sent to a multi-organisation central incident detection manager. Example: ACME Corporation",
+            "type": "string"
+        },
+        "OrganisationId": {
+            "description": "Corporate/Main Office Organisation ID. Where possible official organisation ID manage by national authority. Useful if alerts are sent to a multi-organisation central incident detection manager. This ID has to be chosen depending on the overall detection perimeter and the nature of the monitored organisation (Private/Public, Commercial, International, etc.) Examples: OrganisationId in France could be SIREN, in England could be CR, Germany could be Handelsregisternummer, Spain could be CIF, Italia could be Partita IVA, USA could be EIN, etc. Commercial OrganisationId in Europe could be V.A.T ID",
+            "type": "string"
+        },
+        "EntityName": {
+            "description": "Entity Name, monitored by the organisation, where the incident occurred. Could be a town, region or country name or an internal name. Could also be the name of a client for a MSSP centralizing it's client incidents in a single system. Do not repeat the organisation name in the EntityName Example: - ACME HeadQuaters is located in Paris France and has a local office in India - If the incident occurred in the local office: \"OrganisationName\": \"ACME\" , \"EntityName\": \"India\" - If the incident occurred in the headquaters: \"OrganisationName\": \"ACME\", \"EntityName\": \"Headquaters\" (or \"Paris\")",
+            "type": "string"
+        },
+        "EntityId": {
+            "description": "Entity ID, monitored by the organisation, where the incident occurred. Useful if organisation and entity are not directly linked, like a client and a MSSP.",
+            "type": "string"
+        },
+        "EntitySector": {
+            "description": "The economic sector(s) and sub-sector(s) in which the entity operates. Values follow the dot notation sector.subsector based on the critical infrastructure taxonomy defined in the NIS2 Directive and CER (Critical Entities Resilience) Directive. This attribute enables sector-based correlation, regulatory compliance reporting, and risk context for incident detection.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/entitysectorEnum"
+            }
+        },
+        "Type": {
+            "description": "Incident type.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/typeEnum"
+            }
+        },
+        "Category": {
+            "description": "Incident category.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/categoryEnum"
+            }
+        },
+        "ext-Category": {
+            "description": "A means by which to extend the Category attribute. (see )",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "Cause": {
+            "description": "Incident cause. The cause can be modified by any analyzer on the way of the alert and later by the operator and/or the analyst if new investigation reveals and confirms a different cause of the event.",
+            "$ref": "#/definitions/causeEnum"
+        },
+        "Description": {
+            "description": "Short free text human-readable description of the event. The description can add detail to the event category for easiest/faster comprehension by the operator. Example : * Cryptoware WannaCry blocked on pegasus server * Unknown person entering through east doorway",
+            "type": "string"
+        },
+        "Status": {
+            "description": "Event state in the overall event lifecycle.",
+            "$ref": "#/definitions/statusEnum"
+        },
+        "Priority": {
+            "description": "Priority of the alert. Priority is defined by conbining impact and urgency. It indicates how fast the incident should be taken care of.",
+            "$ref": "#/definitions/priorityEnum"
+        },
+        "Confidence": {
+            "description": "A floating-point value between 0 and 1 indicating the analyzer's confidence in its own reliability of this particular detection, where 0 means that the detection is surely incorrect while 1 means there is no doubt about the detection made.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+        },
+        "Note": {
+            "description": "Free text human-readable additional note, possibly a longer description of the incident if is not already obvious. The Note attribute can be used to store any additional information. It can be additional information about the event and/or about the incident resolution, although the incident resolution information should in principle be stored elsewhere (with a link with the external tool in AltNames)",
+            "type": "string"
+        },
+        "CreateTime": {
+            "description": "Timestamp indicating when the alert was created.",
+            "$ref": "#/definitions/timestampType"
+        },
+        "StartTime": {
+            "description": "Timestamp indicating the deduced start of the event. StartTime can be later than CreateTime in case or Alerts created from forecast information (e.g. Snow Storm expected in two days staring at 10h00)",
+            "$ref": "#/definitions/timestampType"
+        },
+        "EndTime": {
+            "description": "Timestamp indicating the deduced end of the event.",
+            "$ref": "#/definitions/timestampType"
+        },
+        "AltNames": {
+            "description": "Alternative identifiers; strings which help pair the event to internal systems' information (for example ticket IDs inside a request tracking systems).",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "AltCategory": {
+            "description": "Alternate categories from a reference other than IDMEFv2 categories (e.g. MISP, MITRE ATT@CK or another proprietary/internal reference).",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "Ref": {
+            "description": "References to sources of information related to the incident and/or vulnerability, and specific to this incident. This MAY be a URL to additional info, or a URN in a registered or unregistered ad-hoc namespace bearing reasonable information value and uniqueness, such as \"urn:cve:CVE-2013-2266\".",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "format": "uri"
+            }
+        },
+        "CorrelID": {
+            "description": "Identifiers for the messages which were used as information sources to create this message, in case the message has been created based on correlation/analysis/deduction from other messages.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/uuidType"
+            }
+        },
+        "AggrCondition": {
+            "description": "A list of IDMEF fields used to aggregate events. The values for these fields will be the same in all aggregated events. This attribute should mostly be set by intermediary nodes, which detect duplicates, or aggregate events, spanning multiple detection windows, into a longer one. The \"StartTime\" and \"EndTime\" attributes are used in conjunction with this attribute to describe the aggregation window.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "PredID": {
+            "description": "A list containing the identifiers of previous messages which are obsoleted by this message. The obsoleted alerts SHOULD NOT be used anymore. This field can be used to \"update\" an alert.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/uuidType"
+            }
+        },
+        "RelID": {
+            "description": "A list containing the identifiers of other messages related to this message.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/uuidType"
+            }
+        },
+        "Analyzer": {
+            "type": "object",
+            "description": "The Analyzer class describes the module that has analyzed the data captured by the sensors, identified an event of interest and decided to create an alert.",
+            "properties": {
+                "ID": {
+                    "description": "Unique identifier for the analyzer.",
+                    "$ref": "#/definitions/uuidType"
+                },
+                "IP": {
+                    "description": "Analyzer IP address.",
+                    "$ref": "#/definitions/ipType"
+                },
+                "Name": {
+                    "description": "Name of the analyzer, which must be reasonably unique, however still bear some meaningful sense. This attribute usually denotes the hierarchy of organizational units the detector belongs to and its own name. It MAY also be used to distinguish multiple analyzers running with the same IP address.",
+                    "type": "string"
+                },
+                "Hostname": {
+                    "description": "Hostname of this analyzer. SHOULD be a fully-qualified domain name.",
+                    "type": "string"
+                },
+                "Model": {
+                    "description": "Analyzer model description (usually its generic name, brand and version).",
+                    "type": "string"
+                },
+                "Category": {
+                    "description": "Analyzer categories.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/analyzerCategoryEnum"
+                    }
+                },
+                "ext-Category": {
+                    "description": "A means by which to extend the Category attribute. (see )",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "Data": {
+                    "description": "Type of data analyzed during the detection.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/analyzerDataEnum"
+                    }
+                },
+                "ext-Data": {
+                    "description": "A means by which to extend the Data attribute. (see )",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "Method": {
+                    "description": "Detection method.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/analyzerMethodEnum"
+                    }
+                },
+                "ext-Method": {
+                    "description": "A means by which to extend the Method attribute. (see )",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "GeoLocation": {
+                    "description": "GPS coordinates for the analyzer.",
+                    "$ref": "#/definitions/geolocType"
+                },
+                "UnLocation": {
+                    "description": "Standard UN/Locode for the analyzer.",
+                    "$ref": "#/definitions/unlocodeType"
+                },
+                "Location": {
+                    "description": "Internal name for the location of the analyzer.",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+                "Name"
+            ]
+        },
+        "Sensor": {
+            "type": "array",
+            "items": {
+                "description": "The Sensor class describes the module that captured the data before sending it to an analyzer. The Sensor may be a subpart of the Analyzer.",
+                "properties": {
+                    "ID": {
+                        "description": "Unique identifier for the sensor.",
+                        "$ref": "#/definitions/uuidType"
+                    },
+                    "IP": {
+                        "description": "The sensor's IP address.",
+                        "$ref": "#/definitions/ipType"
+                    },
+                    "Name": {
+                        "description": "Name of the sensor, which must be reasonably unique, however still bear some meaningful sense. This attribute usually denotes the hierarchy of organizational units the sensor belongs to and its own name. It MAY also be used to distinguish multiple sensors running with the same IP address.",
+                        "type": "string"
+                    },
+                    "Hostname": {
+                        "description": "The sensor's hostname. This SHOULD be a fully qualified domain name, but may not conform exactly because values extracted from logs, messages, DNS, etc. may themselves be malformed. An empty string MAY be used to explicitly state that this value was inquired but not found (missing DNS entry).",
+                        "type": "string"
+                    },
+                    "Model": {
+                        "description": "The sensor model's description (usually its generic name, brand and version).",
+                        "type": "string"
+                    },
+                    "GeoLocation": {
+                        "description": "GPS coordinates for the analyzer.",
+                        "$ref": "#/definitions/geolocType"
+                    },
+                    "UnLocation": {
+                        "description": "Standard UN/Locode for the sensor.",
+                        "$ref": "#/definitions/unlocodeType"
+                    },
+                    "Location": {
+                        "description": "Internal name for the location of the sensor.",
+                        "type": "string"
+                    },
+                    "CaptureZone": {
+                        "description": "A string that describes the \"capture zone\" of the sensor, as a JSON-serialized string. Depending on the type of sensor, the capture zone may for instance refer to: \n- A JSON object describing a camera's settings (elevation, horizontal and vertical field of view, azimuth, etc.)\n- A description of the IP network where packet capture is taking place.",
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "Name"
+                ]
+            }
+        },
+        "Source": {
+            "type": "array",
+            "items": {
+                "description": "The Source class describes the origin(s) of the event(s) leading up to the creation of this alert.",
+                "properties": {
+                    "ID": {
+                        "description": "Unique identifier for the source.",
+                        "$ref": "#/definitions/uuidType"
+                    },
+                    "IP": {
+                        "description": "Source IP address.",
+                        "$ref": "#/definitions/ipType"
+                    },
+                    "Hostname": {
+                        "description": "Hostname of this source. This SHOULD be a fully qualified domain name, but may not conform exactly because values extracted from logs, messages, DNS, etc. may themselves be malformed. An empty string MAY be used to explicitly state that this value was inquired but not found (missing DNS entry).",
+                        "type": "string"
+                    },
+                    "Category": {
+                        "description": "Source category",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/sourceCategoryEnum"
+                        }
+                    },
+                    "Note": {
+                        "description": "Free text human-readable additional note for this source.",
+                        "type": "string"
+                    },
+                    "TI": {
+                        "description": "Threat Intelligence data about the source. Values in this list MUST use the format \"attribute:origin\", where \"attribute\" refers to the attribute inside this source found inside a Threat Intelligence database, and \"origin\" contains a short identifier for the Threat Intelligence database. E.g. \"IP:Dshield\". Please note that the same attribute may appear multiple times inside the list (because a match was found in multiple Threat Intelligence databases).",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "User": {
+                        "description": "User ID or login responsible for the incident.",
+                        "type": "string"
+                    },
+                    "Email": {
+                        "description": "Email address responsible for the incident. E.g. the value of the \"Reply-To\" or \"From\" header inside a phishing e-mail.",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "Protocol": {
+                        "description": "Protocols related to connections from/to this source. If several protocols are stacked, they MUST be ordered from the lowest (the closest to the medium) to the highest (the closest to the application) according to the ISO/OSI model.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/protocolType"
+                        }
+                    },
+                    "Port": {
+                        "description": "Source ports involved in the incident. Values in this list MUST be integers and MUST be in the range 1-65535.",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "GeoLocation": {
+                        "description": "GPS coordinates for the source.",
+                        "$ref": "#/definitions/geolocType"
+                    },
+                    "UnLocation": {
+                        "description": "Standard UN/Locode for the source.",
+                        "$ref": "#/definitions/unlocodeType"
+                    },
+                    "Location": {
+                        "description": "Internal name for the location of the source.",
+                        "type": "string"
+                    },
+                    "Attachment": {
+                        "description": "Identifiers for attachments related to this source. Each identifier listed here MUST match the \"Name\" attribute for one of the attachments described using the Attachment class .",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/attachmentNameType"
+                        }
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "ID"
+                ]
+            }
+        },
+        "Target": {
+            "type": "array",
+            "items": {
+                "description": "The Target class describes the target(s) impacted by the event(s) leading up to the creation of this alert.",
+                "properties": {
+                    "ID": {
+                        "description": "Unique identifier for the target.",
+                        "$ref": "#/definitions/uuidType"
+                    },
+                    "IP": {
+                        "description": "Target IP address.",
+                        "$ref": "#/definitions/ipType"
+                    },
+                    "Hostname": {
+                        "description": "Hostname of this target. This SHOULD be a fully qualified domain name, but may not conform exactly because values extracted from logs, messages, DNS, etc. may themselves be malformed. An empty string MAY be used to explicitly state that this value was inquired but not found (missing DNS entry).",
+                        "type": "string"
+                    },
+                    "Category": {
+                        "description": "Target category",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/targetCategoryEnum"
+                        }
+                    },
+                    "Note": {
+                        "description": "Free text human-readable additional note for this target.",
+                        "type": "string"
+                    },
+                    "Service": {
+                        "description": "Service or process impacted by the incident.",
+                        "type": "string"
+                    },
+                    "User": {
+                        "description": "User ID or login impacted by the incident.",
+                        "type": "string"
+                    },
+                    "Email": {
+                        "description": "Email address impacted by the incident. E.g. the value of the \"To\" header inside a phishing e-mail.",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "Port": {
+                        "description": "Target ports involved in the incident. Values in this list MUST be integers and MUST be in the range 1-65535.",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "GeoLocation": {
+                        "description": "GPS coordinates for the target.",
+                        "$ref": "#/definitions/geolocType"
+                    },
+                    "UnLocation": {
+                        "description": "Standard UN/Locode for the target.",
+                        "$ref": "#/definitions/unlocodeType"
+                    },
+                    "Location": {
+                        "description": "Internal name for the location of the target.",
+                        "type": "string"
+                    },
+                    "Attachment": {
+                        "description": "Identifiers for attachments related to this target. Each identifier listed here MUST match the \"Name\" attribute for one of the attachments described using the Attachment class .",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/attachmentNameType"
+                        }
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "ID"
+                ]
+            }
+        },
+        "Attachment": {
+            "type": "array",
+            "items": {
+                "description": "The Attachment class contains additional data which was captured in relation with the event.",
+                "properties": {
+                    "Name": {
+                        "description": "A unique identifier among attachments that can be used to reference this attachment from other classes using the \"Attachment\" attribute.",
+                        "$ref": "#/definitions/attachmentNameType"
+                    },
+                    "FileName": {
+                        "description": "Attachment filename. This will usually be the original name of the captured file or the name of the file containing the captured content (e.g. a packet capture file).",
+                        "type": "string"
+                    },
+                    "Hash": {
+                        "description": "A list of hash results for the attachment's Content. The values in this list are computed by taking the raw value of the attachment's \"Content\" attribute. The hash result is computed before any other transformation (e.g. Base64 encoding) is applied to the content, so that a receiving IDMEF system may reverse the transformation, apply the same hashing function and obtain the same hash result. See also the definition for the \"ContentEncoding\" attribute below. It is RECOMMENDED that compatible implementations use one of the hashing functions from the SHA-2 or SHA-3 families to compute the hash results in this list.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/hashType"
+                        }
+                    },
+                    "Size": {
+                        "description": "Length of the content (in bytes). This value MUST be a non-negative integer.",
+                        "type": "integer"
+                    },
+                    "Ref": {
+                        "description": "References to sources of information related to the incident and/or vulnerability, and specific to this attachment.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "ExternalURI": {
+                        "description": "If the attachment's content is available and/or recognizable from an external resource, this is the URI (usually a URL) to that resource. This MAY also be a URN in a registered or unregistered ad-hoc namespace bearing reasonable information value and uniqueness, such as \"urn:mhr:55eaf7effadc07f866d1eaed9c64e7ee49fe081a\" or \"magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C\".",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    },
+                    "Note": {
+                        "description": "Free text human-readable additional note for this attachment.",
+                        "type": "string"
+                    },
+                    "ContentType": {
+                        "description": "Internet Media Type of the attachment. For compatibility reasons, implementations SHOULD prefer one of the well-known media types registered in IANA .",
+                        "$ref": "#/definitions/mediatypeType"
+                    },
+                    "ContentEncoding": {
+                        "description": "Content encoding. The following encodings are defined in this version of the specification: \n- \"json\": The content refers to a JSON object which has been serialized to a string using the serialization procedure defined in .\n- \"base64\": The content has been serialized using the Base64 encoding defined in . The \"base64\" encoding SHOULD be used when the content contains binary data. If omitted, the \"json\" encoding MUST be assumed.",
+                        "type": "string"
+                    },
+                    "Content": {
+                        "description": "The attachment's content, in case it is directly embedded inside the message. For large attachments, it is RECOMMENDED that implementations make use of the \"ExternalURI\" attribute to refererence a copy of the content saved in an external storage mechanism.",
+                        "type": [
+                            "object",
+                            "string"
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "Name"
+                ]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+        "Analyzer",
+        "Version",
+        "ID",
+        "CreateTime"
+    ],
+    "definitions": {
+        "entitysectorEnum": {
+            "enum": [
+                "Undefined",
+                "Banking.Banking",
+                "Banking.Other",
+                "Cemeteries.Crematoria",
+                "Cemeteries.PublicCemeteries",
+                "Cemeteries.Other",
+                "Chemical.ChemicalProduction",
+                "Chemical.Storage",
+                "Chemical.Other",
+                "CivilSociety.ElectionMonitoring",
+                "CivilSociety.HumanitarianAid",
+                "CivilSociety.NGOs",
+                "CivilSociety.Other",
+                "CulturalHeritage.Archives",
+                "CulturalHeritage.HistoricalSites",
+                "CulturalHeritage.Libraries",
+                "CulturalHeritage.Museums",
+                "CulturalHeritage.Other",
+                "Defense.CommandControl",
+                "Defense.CyberDefense",
+                "Defense.DefenseIndustrialBase",
+                "Defense.Logistics",
+                "Defense.MilitaryInstallations",
+                "Defense.Research",
+                "Defense.Other",
+                "Digital.CloudServices",
+                "Digital.DataCenters",
+                "Digital.DigitalProviders",
+                "Digital.DomainNameSystems",
+                "Digital.ICTServiceManagement",
+                "Digital.SatelliteCommunications",
+                "Digital.TelecomNetworks",
+                "Digital.UnderseaCables",
+                "Digital.Other",
+                "Education.PrimarySecondary",
+                "Education.ResearchSchools",
+                "Education.Universities",
+                "Education.Other",
+                "EmergencyServices.CivilProtection",
+                "EmergencyServices.EmergencyMedical",
+                "EmergencyServices.FireAndRescue",
+                "EmergencyServices.Police",
+                "EmergencyServices.Other",
+                "Energy.DistrictHeating",
+                "Energy.Electricity",
+                "Energy.Gas",
+                "Energy.Hydrogen",
+                "Energy.Nuclear",
+                "Energy.Oil",
+                "Energy.Other",
+                "Finance.FinancialMarketInfrastructures",
+                "Finance.Insurance",
+                "Finance.PaymentSystems",
+                "Finance.Other",
+                "Food.AgriculturalProduction",
+                "Food.FoodDistribution",
+                "Food.FoodProcessing",
+                "Food.FoodSafety",
+                "Food.Other",
+                "Health.BloodAndTissue",
+                "Health.HealthcareProviders",
+                "Health.Laboratories",
+                "Health.MedicalDevices",
+                "Health.PharmaceuticalSupplyChain",
+                "Health.PublicHealth",
+                "Health.Other",
+                "Logistics.FreightForwarding",
+                "Logistics.LastMileDelivery",
+                "Logistics.ThirdPartyLogistics",
+                "Logistics.Warehousing",
+                "Logistics.Other",
+                "Manufacturing.Aerospace",
+                "Manufacturing.Batteries",
+                "Manufacturing.Chemical",
+                "Manufacturing.ComputerElectronicOptical",
+                "Manufacturing.Defense",
+                "Manufacturing.MedicalDevices",
+                "Manufacturing.MotorVehicles",
+                "Manufacturing.Pharmaceutical",
+                "Manufacturing.Semiconductors",
+                "Manufacturing.StrategicManufacturing",
+                "Manufacturing.Other",
+                "MediaAndBroadcasting.BroadcastInfrastructure",
+                "MediaAndBroadcasting.OnlineMedia",
+                "MediaAndBroadcasting.Press",
+                "MediaAndBroadcasting.Radio",
+                "MediaAndBroadcasting.Television",
+                "MediaAndBroadcasting.Other",
+                "Mining.CriticalRawMaterials",
+                "Mining.EnergyMinerals",
+                "Mining.Other",
+                "Nuclear.FuelCycle",
+                "Nuclear.Medical",
+                "Nuclear.PowerGeneration",
+                "Nuclear.Research",
+                "Nuclear.Other",
+                "Postal.PostalCourierServices",
+                "Postal.Other",
+                "PublicAdministration.CentralGovernment",
+                "PublicAdministration.Diplomatic",
+                "PublicAdministration.EmergencyServices",
+                "PublicAdministration.Judiciary",
+                "PublicAdministration.LocalGovernment",
+                "PublicAdministration.Other",
+                "ReligiousSites.PilgrimageSites",
+                "ReligiousSites.PlacesOfWorship",
+                "ReligiousSites.Other",
+                "Research.BiologicalSafety",
+                "Research.ChemicalSafety",
+                "Research.Research",
+                "Research.Other",
+                "Space.GroundStations",
+                "Space.LaunchFacilities",
+                "Space.SpaceActivities",
+                "Space.Other",
+                "Transport.Aviation",
+                "Transport.Maritime",
+                "Transport.Pipeline",
+                "Transport.PublicTransport",
+                "Transport.Rail",
+                "Transport.Road",
+                "Transport.Other",
+                "Waste.HazardousWaste",
+                "Waste.NonHazardousWaste",
+                "Waste.NuclearWaste",
+                "Waste.Recycling",
+                "Waste.Other",
+                "Water.DamsAndReservoirs",
+                "Water.DrinkingWater",
+                "Water.Irrigation",
+                "Water.Wastewater",
+                "Water.Other"
+            ],
+            "description": "Possible alert entitysector"
+        },
+        "typeEnum": {
+            "enum": [
+                "Cyber",
+                "Physical",
+                "Availability",
+                "Combined"
+            ],
+            "description": "Possible alert type"
+        },
+        "categoryEnum": {
+            "enum": [
+                "Abuse.Grooming",
+                "Abuse.Harassment",
+                "Abuse.Coercion",
+                "Abuse.Trafficking",
+                "Abuse.Extermism",
+                "Abuse.Other",
+                "Access.Compromise",
+                "Access.Escalation",
+                "Access.Backdoor",
+                "Access.Unauthorized",
+                "Access.Tailgating",
+                "Access.Forced",
+                "Access.Lost",
+                "Access.Clonned",
+                "Access.Authorized",
+                "Access.Other",
+                "Availability.DoS",
+                "Availability.DDoS",
+                "Availability.Outage",
+                "Availability.Failure",
+                "Availability.Misconfiguration",
+                "Availability.Overload",
+                "Availability.HeartBeat",
+                "Availability.Other",
+                "Fraud.Usage",
+                "Fraud.Copyright",
+                "Fraud.Masquerade",
+                "Fraud.Phishing",
+                "Fraud.Corruption",
+                "Fraud.Espionnage",
+                "Fraud.Other",
+                "Insider.Malicious",
+                "Insider.Negligent",
+                "Insider.Other",
+                "Sabotage.Vandalism",
+                "Sabotage.Graffiti",
+                "Sabotage.Destruction",
+                "Sabotage.Tampering",
+                "Sabotage.Equipment",
+                "Sabotage.Disruption",
+                "Sabotage.Data",
+                "Sabotage.Other",
+                "Safety.Explosion",
+                "Safety.Fire",
+                "Safety.Agression",
+                "Safety.Sexual",
+                "Safety.Accident",
+                "Safety.Hostage",
+                "Safety.Other",
+                "SupplyChain.Disruption",
+                "SupplyChain.Compromise",
+                "SupplyChain.Other",
+                "Theft.Equiment",
+                "Theft.Data",
+                "Theft.Machinery",
+                "Theft.PII",
+                "Theft.IP",
+                "Theft.FinInfo",
+                "Theft.Breaches",
+                "Theft.Other",
+                "Operational.Misuse",
+                "Operational.Policy Violation",
+                "Operational.Process Failure",
+                "Operational.Other",
+                "Recon.Netword",
+                "Recon.Landscape",
+                "Recon.Aerial",
+                "Recon.OSINT",
+                "Recon.Other",
+                "National.Terrorism",
+                "National.Conflict",
+                "National.Cyber",
+                "National.Crime",
+                "National.Environemental",
+                "National.Economical",
+                "National.Societal",
+                "National.Other",
+                "SocialEng.Phishing",
+                "SocialEng.Spear Phishing",
+                "SocialEng.Vishing",
+                "SocialEng.Smishing",
+                "SocialEng.Pretexting",
+                "SocialEng.Baiting",
+                "SocialEng.QuidProQuo",
+                "SocialEng.Other",
+                "Malware.Virus",
+                "Malware.Worm",
+                "Malware.Trojan",
+                "Malware.Ransomware",
+                "Malware.Spyware",
+                "Malware.Adware",
+                "Malware.Rootkit",
+                "Malware.Other",
+                "Geophysical.Earthquake",
+                "Geophysical.MassMovement",
+                "Geophysical.Volcanic",
+                "Geophysical.Other",
+                "Meteo.Heat",
+                "Meteo.Cold",
+                "Meteo.Fog",
+                "Meteo.Rain",
+                "Meteo.Snow",
+                "Meteo.Wind",
+                "Meteo.Other",
+                "Hydro.Flood",
+                "Hydro.Landslide",
+                "Hydro.Wave",
+                "Hydro.Other",
+                "Climat.Drought",
+                "Climat.LakeOutburst",
+                "Climat.Wildfire",
+                "Climat.Other",
+                "Biological.Epidemic",
+                "Biological.Insect",
+                "Biological.Animal",
+                "Biological.Zombies",
+                "Biological.Other",
+                "Extraterrestrial.Impact",
+                "Extraterrestrial.Aliens",
+                "Extraterrestrial.SpaceWeather",
+                "Extraterrestrial.Other",
+                "Other.Uncategorised",
+                "Other.Undetermined",
+                "Other.Test",
+                "Other.ext-value"
+            ],
+            "description": "Possible alert category"
+        },
+        "causeEnum": {
+            "enum": [
+                "Normal",
+                "Error",
+                "Malicious",
+                "Malfunction",
+                "Hazard",
+                "Unknown"
+            ],
+            "description": "Possible alert cause"
+        },
+        "statusEnum": {
+            "enum": [
+                "Event",
+                "Incident",
+                "Open",
+                "Closed",
+                "FalsePositive"
+            ],
+            "description": "Possible alert status"
+        },
+        "priorityEnum": {
+            "enum": [
+                "Unknown",
+                "Info",
+                "Low",
+                "Medium",
+                "High"
+            ],
+            "description": "Possible alert priority"
+        },
+        "analyzerCategoryEnum": {
+            "enum": [
+                "Undetermined",
+                "APP.BAST",
+                "APP.DAST",
+                "APP.IAST",
+                "APP.RASP",
+                "APP.SAST",
+                "CLD.CASB",
+                "CLD.CIEM",
+                "CLD.CSPM",
+                "CLD.CWPP",
+                "DDoS.ANTI-DDOS",
+                "DDoS.SCRUB",
+                "DDoS.WAF-DDOS",
+                "EMAIL.ANTI-PHISH",
+                "EMAIL.DMARC",
+                "EMAIL.SEG",
+                "EMAIL.SPAM-FILTER",
+                "END.AM",
+                "END.AV",
+                "END.DLP-EP",
+                "END.EDR",
+                "END.EPP",
+                "END.HIDS",
+                "END.HIPS",
+                "END.HPT",
+                "END.RASP",
+                "ID.DCAP",
+                "ID.DLP",
+                "ID.IAM",
+                "ID.IRM",
+                "ID.PAM",
+                "ID.PIM",
+                "ID.UEBA",
+                "NET.DNS-FW",
+                "NET.DPI",
+                "NET.FW",
+                "NET.NAC",
+                "NET.NBAD",
+                "NET.NDR",
+                "NET.NGFW",
+                "NET.NIDS",
+                "NET.NIPS",
+                "NET.PROXY",
+                "NET.WAF",
+                "NET.WIDS",
+                "NET.WIPS",
+                "OT.IoT-IDS",
+                "OT.OT-IDS",
+                "OT.PLC-SCAN",
+                "PHY.1D-LAS",
+                "PHY.1D-LiDAR",
+                "PHY.2D-LAS",
+                "PHY.2D-LiDAR",
+                "PHY.3D-LAS",
+                "PHY.3D-LiDAR",
+                "PHY.ACCESS-CTRL",
+                "PHY.ADS",
+                "PHY.FR-CAM",
+                "PHY.GLASS-BRK",
+                "PHY.HAR",
+                "PHY.LWIR",
+                "PHY.MOT-SEN",
+                "PHY.MWIR",
+                "PHY.OBJ-DET",
+                "PHY.SWIR",
+                "PHY.VAD",
+                "PHY.VNIR",
+                "SIEM.ETL",
+                "SIEM.LOG",
+                "SIEM.NMS",
+                "SIEM.SIEM",
+                "SIEM.SOAR",
+                "TI.CTI",
+                "TI.TI-FEED",
+                "TI.TIP",
+                "VM.ASM",
+                "VM.PENTEST",
+                "VM.VULN-SCANNER",
+                "ext-value"
+            ],
+            "description": "Possible analyzer category"
+        },
+        "analyzerDataEnum": {
+            "enum": [
+                "Undetermined",
+                "Light",
+                "Acoustics",
+                "Contact",
+                "Vibration",
+                "Temperature",
+                "Humidity",
+                "Rain",
+                "Water",
+                "Fog",
+                "Particles",
+                "Seismic",
+                "Magnetic",
+                "Images",
+                "Thermal",
+                "Lidar",
+                "Network",
+                "Flow",
+                "Protocol",
+                "Datagram",
+                "Host",
+                "Connection",
+                "Port",
+                "SNMP",
+                "Authentication",
+                "Log",
+                "File",
+                "Content",
+                "Data",
+                "Reporting",
+                "Alert",
+                "Relay",
+                "External",
+                "ext-value"
+            ],
+            "description": "Possible analyzer data"
+        },
+        "analyzerMethodEnum": {
+            "enum": [
+                "Undetermined",
+                "AI",
+                "Anomaly",
+                "Behavioral",
+                "Biometric",
+                "Blackhole",
+                "Contextual",
+                "Correlation",
+                "Ensemble",
+                "Fingerprinting",
+                "Frequency",
+                "Fusion",
+                "Geolocation",
+                "Graph-based",
+                "Heat",
+                "Heuristic",
+                "Honeypot",
+                "Hygiene",
+                "Integrity",
+                "Metadata",
+                "Monitor",
+                "Movement",
+                "Orchestration",
+                "Pattern",
+                "Policy",
+                "Predictive",
+                "Protocol",
+                "Recon",
+                "Reputation",
+                "Rule-based",
+                "Sequence",
+                "Signature",
+                "Statistical",
+                "Tarpit",
+                "Threat Intelligence",
+                "Threshold",
+                "Trend",
+                "ext-value"
+            ],
+            "description": "Possible analyzer method"
+        },
+        "sourceCategoryEnum": {
+            "enum": [
+                "Undetermined",
+                "Software.Detected.Intrusion",
+                "Software.Detected.Loitering",
+                "Software.Detected.Tailgating",
+                "Software.Detected.Drowsiness",
+                "Software.Detected.Crowd",
+                "Software.Detected.FireFusion",
+                "Software.Detected.Explosion",
+                "Software.Detected.CyberAttack",
+                "Software.Detected.FailedBiometric",
+                "ChemBio.Gases.CO",
+                "ChemBio.Gases.Methane",
+                "ChemBio.Gases.Propane",
+                "ChemBio.Gases.Hydrogen",
+                "ChemBio.Gases.O2Level",
+                "ChemBio.Gases.VOC",
+                "ChemBio.Gases.Freon",
+                "ChemBio.Gases.Radon",
+                "ChemBio.Gases.CWA",
+                "ChemBio.Threats.Anthrax",
+                "ChemBio.Threats.Ricin",
+                "ChemBio.Threats.Botulinum",
+                "ChemBio.Threats.Pathogen",
+                "ChemBio.Properties.pHLevel",
+                "ChemBio.Properties.ORP",
+                "ChemBio.Properties.Salinity",
+                "Cyber.Network.IPv4",
+                "Cyber.Network.IPv6",
+                "Cyber.Network.MAC",
+                "Cyber.Network.Port",
+                "Cyber.Network.Protocol",
+                "Cyber.Endpoint.ProcessName",
+                "Cyber.Endpoint.PID",
+                "Cyber.Endpoint.CmdLine",
+                "Cyber.Endpoint.FilePath",
+                "Cyber.Endpoint.FileHash",
+                "Cyber.Endpoint.DLL",
+                "Cyber.Endpoint.RegistryKey",
+                "Cyber.Endpoint.ServiceName",
+                "Cyber.Endpoint.ScheduledTask",
+                "Cyber.Endpoint.MemoryArtifact",
+                "Cyber.Email.SenderEmail",
+                "Cyber.Email.RecipientEmail",
+                "Cyber.Email.ReplyToEmail",
+                "Cyber.Identity.Username",
+                "Cyber.Identity.LoginTimestamp",
+                "Cyber.Web.UserAgent",
+                "Cyber.Web.SessionID",
+                "Cyber.Web.URL",
+                "Cyber.Web.Domain",
+                "Cyber.Web.URIPath",
+                "Cyber.Web.ReferrerHeader",
+                "Cyber.Web.HTTPMethod",
+                "Cyber.Application.SQLQuery",
+                "Cyber.Application.XSSPayload",
+                "Cyber.Email.MessageID",
+                "Cyber.Email.ReturnPath",
+                "Cyber.Email.EmailAuthResult",
+                "Cyber.Email.XOrigIP",
+                "Cyber.Cloud.APIToken",
+                "Cyber.Cloud.BucketName",
+                "Cyber.Cloud.CloudResourceID",
+                "Cyber.Cloud.OAuthApp",
+                "Cyber.Forensics.PacketPayload",
+                "Cyber.Forensics.NetFlow",
+                "Cyber.Hardware.USBDeviceID",
+                "Cyber.Hardware.DeviceSerial",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight",
+                "ElectroMag.VisibleLight.Flicker",
+                "ElectroMag.Infrared.HeatTemp",
+                "ElectroMag.Infrared.WarmBody",
+                "ElectroMag.Infrared.ThermalGradient",
+                "ElectroMag.Infrared.GasLeakIR",
+                "ElectroMag.Infrared.MoistureContent",
+                "ElectroMag.Ultraviolet.FlameUV",
+                "ElectroMag.Ultraviolet.CoronaArc",
+                "ElectroMag.Ultraviolet.BioContamUV",
+                "ElectroMag.Ultraviolet.ForgeryUV",
+                "IonizingRadiation.General.Alpha",
+                "IonizingRadiation.General.Beta",
+                "IonizingRadiation.General.Gamma",
+                "IonizingRadiation.General.Xray",
+                "IonizingRadiation.General.Neutron",
+                "IonizingRadiation.General.Cosmic",
+                "IonizingRadiation.General.RadonDecay",
+                "MagElectricFields.General.Ferrous",
+                "MagElectricFields.General.Powerline",
+                "MagElectricFields.General.CurrentFlow",
+                "MagElectricFields.General.Voltage",
+                "MagElectricFields.General.Orientation",
+                "MagElectricFields.General.MagneticAnomaly",
+                "MagElectricFields.General.ESD",
+                "Particulate.Aerosols.SmokeIonization",
+                "Particulate.Aerosols.SmokePhotoelectric",
+                "Particulate.Aerosols.Dust",
+                "Particulate.Aerosols.Pollen",
+                "Particulate.Aerosols.Bioaerosol",
+                "Particulate.Liquids.WaterLeak",
+                "Particulate.Liquids.ChemicalSpill",
+                "Particulate.Liquids.FuelSheen",
+                "Particulate.Liquids.LiquidLevel",
+                "Particulate.Solids.Metal",
+                "Particulate.Solids.Landmine",
+                "Particulate.Solids.ForeignObject",
+                "Particulate.Solids.DensityChange",
+                "Particulate.Solids.GrainFlow",
+                "Acoustic.Vibration.Seismic",
+                "Acoustic.Vibration.Footstep",
+                "Acoustic.Vibration.VibAnalysis",
+                "Acoustic.Vibration.VehicleVibe",
+                "Acoustic.Vibration.StructuralCrack",
+                "Acoustic.Sound.GlassBreak",
+                "Acoustic.Sound.UltrasonicNoise",
+                "Acoustic.Sound.Infrasound",
+                "Acoustic.Sound.SonarEcho",
+                "Acoustic.Sound.PressurizedLeak",
+                "Object.LivingBeings.Human",
+                "Object.LivingBeings.Animal",
+                "Object.LivingBeings.Face",
+                "Object.LivingBeings.EyeGaze",
+                "Object.LivingBeings.HandGesture",
+                "Object.LivingBeings.BodyPose",
+                "Object.Vehicles.Car",
+                "Object.Vehicles.Truck",
+                "Object.Vehicles.Bus",
+                "Object.Vehicles.Moto",
+                "Object.Vehicles.Aircraft",
+                "Object.Vehicles.Boat",
+                "Object.Vehicles.LicensePlate",
+                "Object.Indoor.Furniture",
+                "Object.Indoor.Electronics",
+                "Object.Indoor.Container",
+                "Object.Indoor.Document",
+                "Object.Indoor.Weapon",
+                "Object.Outdoor.Building",
+                "Object.Outdoor.Vegetation",
+                "Object.Outdoor.RoadSign",
+                "Object.Outdoor.Pothole",
+                "Object.SpecificScenes.FireVisual",
+                "Object.SpecificScenes.SmokeVisual",
+                "Object.SpecificScenes.Flood",
+                "Object.SpecificScenes.Snow",
+                "Force.Atmospheric.BaroPress",
+                "Force.Atmospheric.Altitude",
+                "Force.Atmospheric.VacuumLevel",
+                "Force.Touch.PhysicalContact",
+                "Force.Touch.Weight",
+                "Force.Touch.GripStrength",
+                "Force.Touch.TirePressure",
+                "Force.Fluid.WaterPressure",
+                "Force.Fluid.Airflow",
+                "ext-value"
+            ],
+            "description": "Possible source category"
+        },
+        "targetCategoryEnum": {
+            "enum": [
+                "Undetermined",
+                "RealEstate.Land",
+                "RealEstate.Buildings",
+                "RealEstate.SpecialStructures",
+                "Infrastructure.Foundations",
+                "Infrastructure.Networks",
+                "Infrastructure.CivilWorks",
+                "Production.Machinery",
+                "Production.HeavyEquipment",
+                "Production.MachineTools",
+                "Logistics.Vehicles",
+                "Logistics.SpecialVehicles",
+                "Logistics.Containers",
+                "Furniture.OfficeFurniture",
+                "Furniture.HVAC",
+                "Furniture.Fittings",
+                "IT.Hardware",
+                "IT.Endpoints",
+                "IT.Telecom",
+                "IP.Patents",
+                "IP.Trademarks",
+                "IP.Copyrights",
+                "Software.Applications",
+                "Software.Licenses",
+                "Software.Data",
+                "Commercial.ClientBase",
+                "Commercial.Partnerships",
+                "Commercial.Reputation",
+                "Human.Skills",
+                "Human.Organization",
+                "Human.EmployerBrand",
+                "Financial.Cash",
+                "Financial.Investments",
+                "Financial.Receivables",
+                "Marketing.Domains",
+                "Marketing.Identity",
+                "Marketing.Content",
+                "ext-value"
+            ],
+            "description": "Possible target category"
+        },
+        "attachmentNameType": {
+            "description": "A a unique identifier among attachments.",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9]+$"
+        },
+        "portType": {
+            "description": "A network port number. The value 0 is excluded from the range because it never appears in an actual network connection.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "exclusiveMinimum": true
+        },
+        "timestampType": {
+            "description": "A JSON string containing a timestamp conforming to the format given in section 5.6 of RFC 3339.",
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[0-9]|1[012])-([0-2][0-9]|3[01])T([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|[-+]([0-1][0-9]|2[0-3]):[0-5][0-9])?$"
+        },
+        "geolocType": {
+            "description": "Geolocation coordinates. The format for this type matches the definition for locations inside ISO 6709 (eg. \"+48.75726, +2.299528, +65.1\").",
+            "type": "string",
+            "pattern": "^[-+]?([0-9]+(\\.[0-9]*)?)(, ?[-+]?([0-9]+(\\.[0-9]*)?)){1,2}$"
+        },
+        "unlocodeType": {
+            "description": "A valid UN/LOCODE location (e.g. \"FR PAR\"). See also the UN/LOCODE Code List 2020-2 at https://unece.org/trade/cefact/unlocode-code-list-country-and-territory.",
+            "type": "string",
+            "pattern": "^[A-Z]{2} ?[A-Z]{3}$"
+        },
+        "ipType": {
+            "description": "An Internet Protocol address, either version 4 or version 6.",
+            "type": "string",
+            "pattern": "^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$"
+        },
+        "mediatypeType": {
+            "description": "A valid media type (e.g. \"text/plain\") conforming to the format defined in section 3.1.1.1 of RFC 7231. See also http://www.iana.org/assignments/media-types/media-types.xhtml.",
+            "type": "string",
+            "pattern": "^[-!#$%&'*+.^_`|~0-9a-zA-Z]+/[-!#$%&'*+.^_`|~0-9a-zA-Z]+([ \t]*;[ \t]*[-!#$%&'*+.^_`|~0-9a-zA-Z]+=([-!#$%&'*+.^_`|~0-9a-zA-Z]+|\"([\\x5D-~\t !#-\\x5B]|\\\\([\t 0-9a-zA-Z]))*\"))*$"
+        },
+        "uuidType": {
+            "description": "Canonical textual representation for an UUID, as defined in RFC 4122 (e.g. \"e5f9bbae-163e-42f9-a2f2-0daaf78fefb1\")",
+            "type": "string",
+            "pattern": "^[0-9A-Fa-f]{8}(-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$"
+        },
+        "protocolType": {
+            "description": "A JSON string containing a service or protocol name from the set of permitted values defined in the IANA \"Service Name and Transport Protocol Port Number\" registry (http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml).",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9](-?[a-zA-Z0-9])*$"
+        },
+        "hashType": {
+            "description": "A cryptographic hash acting as a checksum for some content, using the format \"function:hex-value\" (e.g. \"md5:dc89f0b4ff9bd3b061dd66bb66c991b1\").",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]+:([a-fA-F0-9]{2})+$"
+        }
+    },
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "IDMEF 2.D.V08-Dev"
+}
