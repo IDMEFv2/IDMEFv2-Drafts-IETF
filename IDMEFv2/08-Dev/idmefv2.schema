@@ -223,7 +223,6 @@
                 }
             },
             "additionalProperties": false,
-            "type": "object",
             "required": [
                 "Name"
             ]
