@@ -93,6 +93,10 @@
             "description": "Timestamp indicating the deduced end of the event.",
             "$ref": "#/definitions/timestampType"
         },
+        "ReportTime": {
+            "description": "Timestamp indicating the reporting time of the event, usually to an external CSIRT or a central SIEM.",
+            "$ref": "#/definitions/timestampType"
+        },
         "AltNames": {
             "description": "Alternative identifiers; strings which help pair the event to internal systems' information (for example ticket IDs inside a request tracking systems).",
             "type": "array",
@@ -806,7 +810,8 @@
                 "Incident",
                 "Open",
                 "Closed",
-                "FalsePositive"
+                "FalsePositive",
+                "Reported"
             ],
             "description": "Possible alert status"
         },
