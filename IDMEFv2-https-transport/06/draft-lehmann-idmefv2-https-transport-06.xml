@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd">
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-lehmann-idmefv2-https-transport-05" ipr="trust200902" consensus="true" obsoletes="4767">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-lehmann-idmefv2-https-transport-06" ipr="trust200902" consensus="true" obsoletes="4767">
   <front>
     <title abbrev="IDMEFv2 - HTTPS Transport">Transport of Incident Detection Message Exchange Format version 2 (IDMEFv2) Messages over HTTPS</title>
     <author fullname="Gilles Lehmann">
@@ -12,14 +12,14 @@
         <email>gilles.lehmann@telecom-sudparis.eu</email>
       </address>
     </author>
-    <date day="27" month="September" year="2025"/>
+    <date day="27" month="March" year="2026"/>
     <keyword>RFC4765</keyword>
     <keyword>IDMEF</keyword>
     <abstract>
       <t>The Incident Detection Message Exchange Format version 2 (IDMEFv2) defines a
         data representation for security incidents detected on cyber and/or physical
         infrastructures.</t>
-      <t>This draft is maintained the IDMEFv2 Task Force. Please consult our website
+      <t>This draft is maintained by the IDMEFv2 Task Force. Please consult our website
         for more information. https://www.idmefv2.org</t>
       <t>The format is agnostic so it can be used in standalone or combined cyber
         (SIEM), physical (PSIM) and availability (NMS) monitoring systems. IDMEFv2 can
@@ -51,7 +51,7 @@
         <t>This document specifies the transport of IDMEFv2 messages within
                 <xref target="RFC9112"/> or <xref target="RFC9113"/> Request and Response
                 messages over Transport Layer Security, a.k.a. <xref target="RFC9110"/>.</t>
-        <t>This document describes a serialization method for IDMEF messages based on the
+        <t>This document describes a serialization method for IDMEF messages based on
                 <xref target="RFC8259"/>.</t>
       </section>
     </section>
@@ -112,7 +112,7 @@
         <name>Compatibility with HTTP(S)</name>
         <t>The implementations MUST implement all REQUIRED functionality for <xref target="RFC9112"/>.
                 The implementations SHOULD implement all REQUIRED functionality for <xref target="RFC9113"/>
-                in a TLS context. In particular, the implementations SHOULD support HTTP/2 protocol negociation
+                in a TLS context. In particular, the implementations SHOULD support HTTP/2 protocol negotiation
                 using the <xref target="RFC7301"/> as defined in <xref target="RFC9113"/> ch 3.3.
                 The "h2c" protocol (HTTP/2.0 over cleartext) MUST NOT be used.
                 HTTP over TLS (also known as HTTPS) is specified in <xref target="RFC9110"/> ch 2.</t>
@@ -327,7 +327,7 @@
       </section>
     </section>
     <section anchor="serialization_json">
-      <name>The JavaScript Object Notation Serialization Method</name>
+      <name>JavaScript Object Notation Serialization Method</name>
       <t>This serialization method aims to convert IDMEFv2 messages to a format that
             is easy to parse and process, both by software/hardware processors, as well
             as humans.</t>
@@ -380,7 +380,7 @@
     <section>
       <name>Security Considerations</name>
       <t>Most of the content in <xref target="protocol"/> deals with security considerations.
-            Great care has been taken to protect the confidentiality, authentification
+            Great care has been taken to protect the confidentiality, authentication
             and integrity of IDMEFv2 messages while in transit.</t>
       <t>In addition, to the requirements set in <xref target="protocol"/>, all security considerations
             of related documents apply, especially the Incident Detection Message Exchange
@@ -403,7 +403,7 @@
             </li>
         </ul>
       <t>IDMEFv2 systems MAY implement additional security measures (e.g. confidentiality
-            and integrity of specific data inside the message at the field's level).
+            and integrity of specific data inside the message at the field level).
             Such additions SHOULD be designed with interoperability in mind, so that
             implementations that do not recognize these extensions can still process IDMEFv2
             messages in a reasonable manner without degrading the security provided by these
@@ -476,7 +476,7 @@
           <author fullname="Gilles Lehmann">
             <organization>Telecom SudParis - France</organization>
           </author>
-          <date day="27" month="September" year="2025"/>
+          <date day="27" month="March" year="2026"/>
         </front>
         <seriesInfo name="Internet-Draft" value="draft-lehmann-idmefv2-01"/>
       </reference>

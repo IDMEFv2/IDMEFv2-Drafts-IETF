@@ -1,0 +1,930 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-lehmann-idmefv2-https-transport-07" ipr="trust200902" consensus="true" obsoletes="4767">
+  <front>
+    <title abbrev="IDMEFv2 - HTTPS Transport">Transport of Incident Detection Message Exchange Format version 2 (IDMEFv2) Messages over HTTPS</title>
+    <author fullname="Gilles Lehmann">
+      <organization>Telecom Sud Paris</organization>
+      <address>
+        <postal>
+          <country>FR</country>
+        </postal>
+        <email>gilles.lehmann@telecom-sudparis.eu</email>
+      </address>
+    </author>
+    <date day="27" month="September" year="2026"/>
+    <keyword>RFC4765</keyword>
+    <keyword>IDMEF</keyword>
+    <abstract>
+      <t>The Incident Detection Message Exchange Format version 2 (IDMEFv2) defines a
+        data representation for security incidents detected on cyber and/or physical
+        infrastructures.</t>
+      <t>This draft is maintained by the IDMEFv2 Task Force. Please consult our website
+        for more information. https://www.idmefv2.org</t>
+      <t>The format is agnostic so it can be used in standalone or combined cyber
+        (SIEM), physical (PSIM) and availability (NMS) monitoring systems. IDMEFv2 can
+        also be used to represent man made or natural hazards threats.</t>
+      <t>IDMEFv2 improves situational awareness by facilitating correlation of multiple types
+        of events using the same base format thus enabling efficient detection of complex
+        and combined cyber and physical attacks and incidents.</t>
+      <t>This document defines a way to transport IDMEFv2 Alerts over HTTPs.</t>
+      <t>If approved this document would obsolete RFC4767.</t>
+    </abstract>
+  </front>
+  <middle>
+    <section>
+      <name>Introduction</name>
+      <t><xref target="RFC-DEV-IDMEFv2"/> defines a model for the purpose of describing
+            security alerts and incidents as IDMEF version 2 (IDMEFv2) messages.
+            It also defines serialization methods so that IDMEFv2 messages can be
+            shared between IDMEFv2 Analyser detecting incidents and IDMEFv2 Manager,
+            the management systems that may need to interact with them.</t>
+      <section>
+        <name>About the transmission protocol</name>
+        <t>IDMEFv2 defines a message format, not a protocol, as the sharing of
+                messages is assumed to be out of scope in order to allow Analyzers and
+                Managers to exchange and store alerts in a way most suited to their established
+                incident-detection processes. However, a protocol specification is required
+                so that actual exchanges can take place between the involved programs.
+                Defining a common protocol also ensures interoperability between
+                otherwise concurrent implementations.</t>
+        <t>This document specifies the transport of IDMEFv2 messages within
+                <xref target="RFC9112"/> or <xref target="RFC9113"/> Request and Response
+                messages over Transport Layer Security, a.k.a. <xref target="RFC9110"/>.</t>
+        <t>This document describes a serialization method for IDMEF messages based on
+                <xref target="RFC8259"/>.</t>
+      </section>
+    </section>
+    <section>
+      <name>Terminology</name>
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+            "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+            document are to be interpreted as described in <xref target="RFC2119"/>.</t>
+    </section>
+    <section>
+      <name>Normative sections</name>
+      <t>Implementations of IDMEFv2 willing to exchange messages with other
+            implementations are REQUIRED to fully implement:</t>
+      <ul>
+            <li>
+                <t>The transmission protocol defined in <xref target="protocol"/></t>
+            </li>
+            <li>
+                <t>The JavaScript Object Notation (JSON) serialization method defined
+                    in <xref target="serialization_json" format="default"/></t>
+            </li>
+        </ul>
+    </section>
+    <section anchor="protocol">
+      <name>Transmission of IDMEFv2 Messages over HTTPS</name>
+      <t>This section specifies the details of the transport of IDMEFv2 messages
+            <xref target="RFC-DEV-IDMEFv2"/> over HTTPS.</t>
+      <t><xref target="BCP56"/> contains a number of important considerations when using
+            HTTP for application protocols. These include the size of the payload for
+            the application, whether the application will use a web browser, whether the
+            protocol should be defined on a port other than the well-known port for HTTP/HTTPS,
+            and if the security provided through HTTPS suits the needs of the new application.</t>
+      <t>It is acknowledged within the scope of these concerns that HTTPS
+            is not ideally suited for IDMEFv2 transport, as the former is a client-server
+            protocol and the latter a message-exchange protocol; however,
+            the ease of implementation over HTTPS outweighs these concerns.</t>
+      <section>
+        <name>Architecture overview</name>
+        <t>In the context of this document, it is expected that IDMEFv2 Analyzers will act
+                as HTTP clients, while IDMEFv2 Managers act as HTTP servers.</t>
+        <t>However, due to external constraints, implementation-specific design decisions, etc.
+                these roles may sometimes be switched around. This can be especially true when
+                dealing with segmented networks such as demilitarized zones, where the Analyzer
+                may be unable to contact its Manager, or for communications which do not rely on
+                an Analyzer sending IDMEFv2 messages to a Manager (e.g. for Manager-to-Manager
+                communications). Such specific cases are outside the scope of this specification.</t>
+      </section>
+      <section>
+        <name>Listening port</name>
+        <t>Consistent with <xref target="BCP56"/>, compatible system participating in a consortium
+                and hosting a server for the purpose  of receiving IDMEFv2 message using this
+                specification SHOULD listen for TCP connections on port TBD
+                (see  in <xref target="iana"/> for more information).</t>
+        <t>The systems MAY be configurable so as to allow listening on ports other than
+                the well-known port; this configuration is out of scope for this specification.</t>
+      </section>
+      <section>
+        <name>Compatibility with HTTP(S)</name>
+        <t>The implementations MUST implement all REQUIRED functionality for <xref target="RFC9112"/>.
+                The implementations SHOULD implement all REQUIRED functionality for <xref target="RFC9113"/>
+                in a TLS context. In particular, the implementations SHOULD support HTTP/2 protocol negotiation
+                using the <xref target="RFC7301"/> as defined in <xref target="RFC9113"/> ch 3.3.
+                The "h2c" protocol (HTTP/2.0 over cleartext) MUST NOT be used.
+                HTTP over TLS (also known as HTTPS) is specified in <xref target="RFC9110"/> ch 2.</t>
+        <t>Each IDMEFv2 message MUST be sent as a separate HTTP Request. However, an implementation
+                MAY send multiple HTTP Requests in parallel to achieve higher message throughput.
+                This can be done by creating a separate connection to the HTTP server for each request,
+                or by using any multiplexing mechanism provided by the underlying protocol (see for example
+                <xref target="RFC9113"/> ch 5).</t>
+        <t>All IDMEFv2 messages sent in HTTP Requests MUST be sent using the POST method.
+                In addition, the Request-URI of such requests SHOULD be set to '/' for interoperability,
+                but an implementation MUST also be able to handle alternative paths to cope with situations
+                where URI rewriting may be used (e.g. by a reverse proxy server).</t>
+        <t>As IDMEFv2 messages MUST be sent using the POST method, a compatible implementation
+                SHOULD answer with an appropriate HTTP code (405 Method Not Allowed) to requests made
+                using any other method.</t>
+        <t>If a request is made to a Request-URI other than the one dedicated to the processing of
+                IDMEFv2 messages, the server SHOULD return an appropriate HTTP code (e.g. 404 Not Found).</t>
+        <t>The HTTP Request's body MUST be set to the serialized form of the IDMEFv2 message.
+                Since an IDMEFv2 message can be serialized in a variety of ways, the 'Content-Type'
+                Request header <xref target="RFC2045"/> MUST be set to a media type <xref target="RFC2046"/> that
+                reflects the mechanism used to perform the serialization.
+                If the server does not support the media type sent by the client, it SHOULD respond
+                with an appropriate HTTP code (415 Unsupported Media Type).</t>
+        <t>A conforming IDMEFv2 system acting as an HTTP server MUST support content negotiation
+                based on the value of the 'Accept' Request header sent by the client.
+                If the client does not advertise supported media types (i.e. omits the 'Accept' header),
+                the server MUST default to 'application/json' and use the format defined in <xref target="RFC8259"/>
+                to build the HTTP response.
+                If the server does not support any of the media types advertised by the client, it SHOULD
+                respond with an appropriate HTTP code (406 Not Acceptable).</t>
+        <t>If the Response does not contain a body, the appropriate HTTP code SHOULD be returned
+                to the client (204 No Content). In this case, the 'Content-Type' header can be omitted
+                from the HTTP Response entirely.</t>
+        <t>To improve compatibility between implementations, it is RECOMMENDED that all IDMEFv2
+                systems conforming to this document support the JSON serialization format defined in
+                <xref target="RFC-DEV-IDMEFv2"/>, with a media type set to 'application/json'.</t>
+        <t>If an IDMEFv2 system receives an improper IDMEFv2 message in an HTTP Request,
+                it MUST return an appropriate 4xx Client Error result code to the
+                requesting system (e.g. 400 Bad Request).</t>
+        <t>The HTTP code serves as an acknowledgment of the message. The receiving IDMEFv2 system
+                SHOULD NOT confirm acceptance of a message (2xx) unless it managed to safely deal with it,
+                e.g. by saving the message to disk / in a database, or by relaying it to another
+                system that successfully acknowledged it for further processing.</t>
+        <t>If an IDMEFv2 implementation cannot process an IDMEFv2 message
+                received in an HTTP Request due to an error on its own side, it MUST
+                return an appropriate 5xx Server Error result code to the requesting
+                system.</t>
+        <t>Note that HTTP provides no mechanism for signaling to a server that a
+                Response body is not a valid IDMEFv2 response. If an IDMEFv2 system
+                receives an improper HTTP Response, or cannot process an HTTP Response
+                due to an error on its own side, it MUST log the error and present it
+                to the IDMEFv2 system administrator for handling; the error logging
+                format is considered an implementation detail and is out of scope
+                for this specification.</t>
+        <t><xref target="appendix-http-codes"/> provides informative guidance on how
+                to map various error conditions to an appropriate HTTP result code.</t>
+        <t>IDMEFv2 systems relying on HTTP/1.1 MUST support and SHOULD use HTTP/1.1
+                persistent connections as described in <xref target="RFC9112"/>.
+                IDMEFv2 systems MUST support chunked transfer encoding on the HTTP
+                server side to allow the implementation of clients that do not need
+                to pre-calculate message sizes before constructing HTTP headers.</t>
+      </section>
+      <section>
+        <name>Compatibility with DNS</name>
+        <t>The use of stable DNS names to address IDMEFv2 systems is RECOMMENDED;
+                this facilitates connection to IDMEFv2 systems within a consortium.
+                The protocol provides no in-band method for handling a change of address
+                of an IDMEFv2 system.</t>
+      </section>
+      <section>
+        <name>Compatibility with TLS</name>
+        <section>
+          <name>Acceptable TLS versions</name>
+          <t>IDMEFv2 systems SHOULD use TLS version 1.3 <xref target="RFC8446"/> or higher for
+                    confidentiality, identification, and authentication, when sending IDMEFv2
+                    messages over HTTPS.</t>
+          <t>IDMEFv2 systems MUST NOT request, offer, or use any version of SSL,
+                    or any version of TLS prior to 1.3, due to known weaknesses in these
+                    protocols; see <xref target="RFC8446"/> ch E for more information.</t>
+        </section>
+        <section>
+          <name>Acceptable ciphersuites</name>
+          <t>The TLS session MUST use non-NULL ciphersuites for authentication, integrity,
+                    and confidentiality. IDMEFv2 systems MUST NOT use ciphersuites with known
+                    vulnerabilities and MUST use ciphersuites that provide Perfect Forward
+                    Secrecy to protect the messages' confidentiality in case a vulnerability
+                    is later discovered in the ciphersuites.</t>
+          <t>Administrators can find guidance regarding the selection of acceptable
+                    ciphersuites for TLS version 1.2 in <xref target="BCP195"/>.</t>
+        </section>
+        <section>
+          <name>Authentication</name>
+          <t>IDMEFv2 systems MUST use mutual authentication; that is, both IDMEFv2 systems
+                    acting as HTTPS clients and IDMEFv2 systems acting as HTTPS servers MUST
+                    be identified by an X.509 certificate <xref target="RFC5280"/>.
+                    Mutual authentication requires full path validation on each certificate,
+                    as defined in <xref target="RFC5280"/>.</t>
+          <t>All IDMEFv2 systems SHOULD be identified by a certificate containing a
+                    DNS-ID identifier as in <xref target="RFC6125"/> ch 6.4; Common Names (CN-IDs)
+                    MUST NOT be included in certificates identifying IDMEFv2 systems.</t>
+        </section>
+        <section>
+          <name>Certificate validation</name>
+          <t>IDMEFv2 systems MUST verify the reference identifiers of their peers against those
+                    stored in the certificates presented using the methods defined in <xref target="RFC6125"/>.
+                    In addition, the following IDMEFv2-specific considerations apply:</t>
+          <ul>
+                    <li>
+                        <t>Wildcards MUST NOT appear in the DNS-ID of a certificate identifying an IDMEFv2
+                            system. If such a certificate is received by an IDMEFv2 system, the verification
+                            MUST fail and the receiving IDMEFv2 system MUST close the connection.</t>
+                    </li>
+                    <li>
+                        <t>An IDMEFv2 system MAY match the DNS-ID with a reverse DNS lookup of the connecting
+                            IDMEFv2 peer; this support SHOULD allow the lookup to be cached and/or done
+                            in advance in order to ensure verifiability during instability or compromise
+                            of DNS itself.</t>
+                    </li>
+                    <li>
+                        <t>IDMEFv2 systems MUST support the verification of certificates against an
+                            explicit list of approved peer certificates.</t>
+                    </li>
+                    <li>
+                        <t>IDMEFv2 systems MAY apply additional security measures such as IP filtering
+                            to further restrict the list of authorized peers.
+                            Such additional defenses are outside of the scope of this specification.</t>
+                    </li>
+                </ul>
+        </section>
+        <section>
+          <name>PKI integration and certificate issuance</name>
+          <t>This document makes no provision on whether the security consortium implementing
+                    IDMEFv2 is responsible or not for issuing the certificates used by the systems.</t>
+          <t>In a PKIX certificate to be presented by an IDMEFv2 system, the certificate
+                    MUST include one or more identifiers associated with the IDMEFv2 system.</t>
+          <t>The following IDMEFv2-specific considerations apply:</t>
+          <ul>
+                    <li>
+                        <t>Support for the DNS-ID identifier type <xref target="RFC5280"/> is REQUIRED
+                            in both IDMEFv2 Analyzers and Managers. Certification authorities that issue
+                            IDMEFv2-specific certificates MUST support the DNS-ID identifier type.
+                            IDMEFv2 service providers SHOULD include the DNS-ID identifier type
+                            in certificate requests.</t>
+                    </li>
+                    <li>
+                        <t>Support for the SRV-ID identifier type <xref target="RFC4985"/> is REQUIRED
+                            in both IDMEFv2 Analyzers and Managers implementations using the "_idmef"
+                            application service type.
+                            Certificate authorities that issue IDMEFv2-specific certificates
+                            SHOULD support the SRV-ID identifier type. IDMEFv2 service providers SHOULD
+                            include the SRV-ID identifier type in certificate requests.</t>
+                    </li>
+                    <li>
+                        <t>Support for the URI-ID identifier type (<xref target="RFC5280"/> and <xref target="RFC3986"/>)
+                            is OPTIONAL for both IDMEFv2 Analyzers and Managers.
+                            Certification authorities that issue IDMEFv2-specific certificates SHOULD
+                            support the URI-ID identifier type. IDMEFv2 service providers MAY include
+                            the URI-ID identifier type in certificate requests.</t>
+                    </li>
+                    <li>
+                        <t>Support for the CN-ID identifier type <xref target="RFC5280"/> is discouraged.
+                            Certification authorities that issue IDMEFv2-specific certificates SHOULD NOT
+                            support the CN-ID identifier type. IDMEFv2 service providers MUST NOT include
+                            the CN-ID identifier type in certificate requests.</t>
+                    </li>
+                    <li>
+                        <t>DNS domain names in IDMEFv2-specific certificates MUST NOT contain
+                            the wildcard character '*'. Certification authorities that issue
+                            IDMEFv2-specific certificates MUST refuse to issue certificates
+                            containing a wildcard character.</t>
+                    </li>
+                </ul>
+          <t>Great care must be taken by administrators when selecting the PKI to use,
+                    as trusting a rogue PKI could have dramatic results on the integrity,
+                    confidentiality and authentication mechanisms provided by TLS; and hence,
+                    result in the compromise of the protocol defined in this specification.</t>
+        </section>
+      </section>
+      <section>
+        <name>Locating the HTTPS endpoint using DNS</name>
+        <t>Information about an organization's IDMEFv2 over HTTPS endpoint's location
+                may be stored using DNS Service Location Records (SRV) <xref target="RFC2782"/>.
+                The data in a SRV record contains the DNS name of the server that provides
+                the IDMEFv2 over HTTPS server, the corresponding Port number, and parameters
+                that enable the client to choose an appropriate server from multiple servers
+                according to the algorithm described in <xref target="RFC2782"/>.
+                The name of this record has the following format:</t>
+        <sourcecode type="none">_&lt;Service&gt;._&lt;Proto&gt;.&lt;Domain&gt;</sourcecode>
+        <t>where &lt;Service&gt; is always "idmef", and &lt;Proto&gt; is always "tcp".
+                &lt;Domain&gt; is the domain name of the entity exposing the endpoint.
+                Note that "idmef" is the symbolic name for the IDMEFv2 over HTTPS
+                service in Assigned Numbers <xref target="RFC3232"/>, as required by
+                <xref target="RFC2782"/>.</t>
+        <t>Presence of such records enables clients to find the IDMEFv2 over HTTPS
+                endpoints using standard DNS query. An IDMEFv2 system seeking the
+                endpoint for a particular entity, does a SRV record query using the DNS
+                name formed as described in the preceding paragraph, and interprets
+                the response as described in <xref target="RFC2782"/> to determine a host
+                (or set of hosts) to contact. As an example, a client that searches
+                for the IDMEFv2 over HTTPS endpoint for "example.net" will submit a
+                DNS query for a set of SRV records with owner name:</t>
+        <sourcecode type="none">_idmef._tcp.example.net.</sourcecode>
+        <t>The requesting system will receive the list of SRV records published
+                in DNS that satisfy the requested criteria. The following is an example of
+                such a record:</t>
+        <sourcecode type="none">_idmef._tcp.example.net.  IN  SRV  0  0  TBD  soc.example.net.</sourcecode>
+        <t>The set of returned records may contain multiple records in the case
+                where multiple servers can act as endpoints for the same domain.
+                If there are no matching SRV records available for the domain name,
+                the client SHOULD NOT attempt to 'walk the tree' by removing the least
+                significant portion of the constructed fully qualified domain name.</t>
+      </section>
+    </section>
+    <section anchor="serialization_json">
+      <name>JavaScript Object Notation Serialization Method</name>
+      <t>This serialization method aims to convert IDMEFv2 messages to a format that
+            is easy to parse and process, both by software/hardware processors, as well
+            as humans.</t>
+      <t>It relies on the the JavaScript Object Notation (JSON) Data Interchange Format
+            defined in <xref target="RFC8259"/>.</t>
+      <t>Conforming implementations MUST implement all the requirements specified
+            in <xref target="RFC8259"/>.</t>
+      <t>In addition, the following rules MUST be observed when serializing an IDMEFv2
+            message:</t>
+      <ul>
+            <li>
+                <t>The top-level Alert class (<xref target="RFC-DEV-IDMEFv2"/> ch 4.2) is represented
+                    as a JSON object (<xref target="RFC8259"/> ch 4). This JSON object is returned
+                    to the calling process at the end of the serialization process.</t>
+            </li>
+            <li>
+                <t>Aggregate classes are represented as JSON objects and stored as members
+                    of the top-level JSON object, using the same name as in the IDMEF data model.
+                    E.g. the Analyzer aggregate class (<xref target="RFC-DEV-IDMEFv2"/> ch 4.3) appears
+                    under the name "Analyzer" inside the top-level JSON object.</t>
+            </li>
+            <li>
+                <t>Attributes are stored as members of the JSON object representing the class
+                    they belong to, using the same name as in the IDMEF data model.
+                    E.g. the "Version" attribute of the Alert class is stored under the name
+                    "Version" inside the top-level JSON object.</t>
+            </li>
+            <li>
+                <t>Lists from the IDMEF data model are represented as JSON arrays
+                    (<xref target="RFC8259"/> ch 5). This also applies to aggregate classes
+                    where a list is expected.
+                    E.g. the "Sensor" member inside the top-level JSON object
+                    contains a list of objects, where each object represents an instance
+                    of the Sensor aggregate class (<xref target="RFC-DEV-IDMEFv2"/> ch 4.4).</t>
+            </li>
+            <li>
+                <t>The various string-based data types listed in <xref target="RFC-DEV-IDMEFv2"/> ch 3.3
+                    are represented as JSON strings (<xref target="RFC8259"/> ch 7).
+                    Please note that the issues outlined in <xref target="RFC8259"/> ch 8
+                    regarding strings processing also apply here.</t>
+            </li>
+            <li>
+                <t>Since JSON does not provide a way to distinguish between an integer
+                    value and a floating-point (decimal) value, IDMEF attributes with
+                    the "INT" and "FLOAT" type annotations are both represented
+                    as JSON numbers (<xref target="RFC8259"/> ch 6).</t>
+            </li>
+        </ul>
+    </section>
+    <section>
+      <name>Security Considerations</name>
+      <t>Most of the content in <xref target="protocol"/> deals with security considerations.
+            Great care has been taken to protect the confidentiality, authentication
+            and integrity of IDMEFv2 messages while in transit.</t>
+      <t>In addition, to the requirements set in <xref target="protocol"/>, all security considerations
+            of related documents apply, especially the Incident Detection Message Exchange
+            Format version 2 <xref target="RFC-DEV-IDMEFv2"/>. Implementations should also be aware
+            of known attacks against Transport Layer Security (TLS) and Datagram TLS (DTLS),
+            and how to mitigate them <xref target="RFC7457"/>.</t>
+      <t>Specific considerations have been taken into account regarding certificates usage:</t>
+      <ul>
+            <li>
+                <t>Use of the wildcard character inside certificates lacks clear specifications
+                    and consistency across application technologies. Considering the issues outlined
+                    in <xref target="RFC6125"/> ch 7.2 regarding such certificates, the use of wildcard
+                    characters inside certificates is explicitly prohibited in this document.</t>
+            </li>
+            <li>
+                <t>Use of the Common Name field (CN-ID) has been deprecated for a long time
+                    (<xref target="RFC9110"/> ch 3.1). Moreover, this field does not cope well
+                    with multiple identifiers (<xref target="RFC6125"/> ch 7.4).
+                    As such, this document explicitly prohibits the use of CN-IDs altogether.</t>
+            </li>
+        </ul>
+      <t>IDMEFv2 systems MAY implement additional security measures (e.g. confidentiality
+            and integrity of specific data inside the message at the field level).
+            Such additions SHOULD be designed with interoperability in mind, so that
+            implementations that do not recognize these extensions can still process IDMEFv2
+            messages in a reasonable manner without degrading the security provided by these
+            additions (e.g. by omitting the additions entirely when passing the message to
+            another system, or by handling them as opaque data).
+            The design of such measures is outside the scope of this document.</t>
+    </section>
+    <section anchor="iana">
+      <name>IANA Considerations</name>
+      <t>Consistent with <xref target="BCP56"/>, since IDMEFv2 over HTTP/TLS is a
+            substantially new service, and should be controlled at the consortium
+            member network's border differently than HTTP/TLS, it requires a new
+            port number.</t>
+      <t>IANA will assigned port TBD/tcp to IDMEFv2 over HTTP/TLS
+            with service name "IDMEFv2".</t>
+      <t>Registration template:</t>
+      <ul>
+            <li>
+                <t>Service Name: IDMEFv2</t>
+            </li>
+            <li>
+                <t>Transport Protocol: TCP</t>
+            </li>
+            <li>
+                <t>Assignee: Telecom SudParis</t>
+            </li>
+            <li>
+                <t>Contact: Telecom SudParis ( Herve.Debar @telecom-sudparis.eu )</t>
+            </li>
+            <li>
+                <t>Description: Transport of Incident Detection Message Exchange Format version
+                    2 (IDMEFv2) Messages over HTTPS</t>
+            </li>
+            <li>
+                <t>Reference: TBD</t>
+            </li>
+            <li>
+                <t>Port Number: TBD</t>
+            </li>
+        </ul>
+    </section>
+    <section>
+      <name>Acknowledgement</name>
+      <t>The following groups and individuals contributed to the creation of this document and should be recognized for their efforts.</t>
+      <ul>
+            <li>
+                <t>Thomas Andrejak &amp; François Poirotte (Co-authors of the first version of this document)</t>
+            </li>
+        </ul>
+    </section>
+  </middle>
+  <back>
+    <references title="Normative References">
+      <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119">
+  <front>
+    <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+    <author fullname="S. Bradner" initials="S." surname="Bradner"/>
+    <date month="March" year="1997"/>
+    <abstract>
+      <t>In many standards track documents several words are used to signify the requirements in the specification. These words are often capitalized. This document defines these words as they should be interpreted in IETF documents. This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="BCP" value="14"/>
+  <seriesInfo name="RFC" value="2119"/>
+  <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+</reference>
+      <reference target="https://github.com/IDMEFv2/" anchor="RFC-DEV-IDMEFv2">
+        <front>
+          <title abbrev="IDMEFv2">The Incident Detection Message Exchange Format (IDMEF) version 2</title>
+          <author fullname="Gilles Lehmann">
+            <organization>Telecom SudParis - France</organization>
+          </author>
+          <date day="27" month="September" year="2026"/>
+        </front>
+        <seriesInfo name="Internet-Draft" value="draft-lehmann-idmefv2-01"/>
+      </reference>
+      <reference anchor="RFC9112" target="https://www.rfc-editor.org/info/rfc9112">
+  <front>
+    <title>HTTP/1.1</title>
+    <author fullname="R. Fielding" initials="R." role="editor" surname="Fielding"/>
+    <author fullname="M. Nottingham" initials="M." role="editor" surname="Nottingham"/>
+    <author fullname="J. Reschke" initials="J." role="editor" surname="Reschke"/>
+    <date month="June" year="2022"/>
+    <abstract>
+      <t>The Hypertext Transfer Protocol (HTTP) is a stateless application-level protocol for distributed, collaborative, hypertext information systems. This document specifies the HTTP/1.1 message syntax, message parsing, connection management, and related security concerns.</t>
+      <t>This document obsoletes portions of RFC 7230.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="STD" value="99"/>
+  <seriesInfo name="RFC" value="9112"/>
+  <seriesInfo name="DOI" value="10.17487/RFC9112"/>
+</reference>
+      <reference anchor="RFC3986" target="https://www.rfc-editor.org/info/rfc3986">
+  <front>
+    <title>Uniform Resource Identifier (URI): Generic Syntax</title>
+    <author fullname="T. Berners-Lee" initials="T." surname="Berners-Lee"/>
+    <author fullname="R. Fielding" initials="R." surname="Fielding"/>
+    <author fullname="L. Masinter" initials="L." surname="Masinter"/>
+    <date month="January" year="2005"/>
+    <abstract>
+      <t>A Uniform Resource Identifier (URI) is a compact sequence of characters that identifies an abstract or physical resource. This specification defines the generic URI syntax and a process for resolving URI references that might be in relative form, along with guidelines and security considerations for the use of URIs on the Internet. The URI syntax defines a grammar that is a superset of all valid URIs, allowing an implementation to parse the common components of a URI reference without knowing the scheme-specific requirements of every possible identifier. This specification does not define a generative grammar for URIs; that task is performed by the individual specifications of each URI scheme. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="STD" value="66"/>
+  <seriesInfo name="RFC" value="3986"/>
+  <seriesInfo name="DOI" value="10.17487/RFC3986"/>
+</reference>
+      <reference anchor="RFC9113" target="https://www.rfc-editor.org/info/rfc9113">
+  <front>
+    <title>HTTP/2</title>
+    <author fullname="M. Thomson" initials="M." role="editor" surname="Thomson"/>
+    <author fullname="C. Benfield" initials="C." role="editor" surname="Benfield"/>
+    <date month="June" year="2022"/>
+    <abstract>
+      <t>This specification describes an optimized expression of the semantics of the Hypertext Transfer Protocol (HTTP), referred to as HTTP version 2 (HTTP/2). HTTP/2 enables a more efficient use of network resources and a reduced latency by introducing field compression and allowing multiple concurrent exchanges on the same connection.</t>
+      <t>This document obsoletes RFCs 7540 and 8740.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="9113"/>
+  <seriesInfo name="DOI" value="10.17487/RFC9113"/>
+</reference>
+      <reference anchor="RFC9110" target="https://www.rfc-editor.org/info/rfc9110">
+  <front>
+    <title>HTTP Semantics</title>
+    <author fullname="R. Fielding" initials="R." role="editor" surname="Fielding"/>
+    <author fullname="M. Nottingham" initials="M." role="editor" surname="Nottingham"/>
+    <author fullname="J. Reschke" initials="J." role="editor" surname="Reschke"/>
+    <date month="June" year="2022"/>
+    <abstract>
+      <t>The Hypertext Transfer Protocol (HTTP) is a stateless application-level protocol for distributed, collaborative, hypertext information systems. This document describes the overall architecture of HTTP, establishes common terminology, and defines aspects of the protocol that are shared by all versions. In this definition are core protocol elements, extensibility mechanisms, and the "http" and "https" Uniform Resource Identifier (URI) schemes.</t>
+      <t>This document updates RFC 3864 and obsoletes RFCs 2818, 7231, 7232, 7233, 7235, 7538, 7615, 7694, and portions of 7230.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="STD" value="97"/>
+  <seriesInfo name="RFC" value="9110"/>
+  <seriesInfo name="DOI" value="10.17487/RFC9110"/>
+</reference>
+      <reference anchor="RFC8446" target="https://www.rfc-editor.org/info/rfc8446">
+  <front>
+    <title>The Transport Layer Security (TLS) Protocol Version 1.3</title>
+    <author fullname="E. Rescorla" initials="E." surname="Rescorla"/>
+    <date month="August" year="2018"/>
+    <abstract>
+      <t>This document specifies version 1.3 of the Transport Layer Security (TLS) protocol. TLS allows client/server applications to communicate over the Internet in a way that is designed to prevent eavesdropping, tampering, and message forgery.</t>
+      <t>This document updates RFCs 5705 and 6066, and obsoletes RFCs 5077, 5246, and 6961. This document also specifies new requirements for TLS 1.2 implementations.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="8446"/>
+  <seriesInfo name="DOI" value="10.17487/RFC8446"/>
+</reference>
+      <reference anchor="RFC5280" target="https://www.rfc-editor.org/info/rfc5280">
+  <front>
+    <title>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</title>
+    <author fullname="D. Cooper" initials="D." surname="Cooper"/>
+    <author fullname="S. Santesson" initials="S." surname="Santesson"/>
+    <author fullname="S. Farrell" initials="S." surname="Farrell"/>
+    <author fullname="S. Boeyen" initials="S." surname="Boeyen"/>
+    <author fullname="R. Housley" initials="R." surname="Housley"/>
+    <author fullname="W. Polk" initials="W." surname="Polk"/>
+    <date month="May" year="2008"/>
+    <abstract>
+      <t>This memo profiles the X.509 v3 certificate and X.509 v2 certificate revocation list (CRL) for use in the Internet.  An overview of this approach and model is provided as an introduction.  The X.509 v3 certificate format is described in detail, with additional information regarding the format and semantics of Internet name forms.  Standard certificate extensions are described and two Internet-specific extensions are defined.  A set of required certificate extensions is specified.  The X.509 v2 CRL format is described in detail along with standard and Internet-specific extensions.  An algorithm for X.509 certification path validation is described.  An ASN.1 module and examples are provided in the appendices. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="5280"/>
+  <seriesInfo name="DOI" value="10.17487/RFC5280"/>
+</reference>
+      <reference anchor="RFC4985" target="https://www.rfc-editor.org/info/rfc4985">
+  <front>
+    <title>Internet X.509 Public Key Infrastructure Subject Alternative Name for Expression of Service Name</title>
+    <author fullname="S. Santesson" initials="S." surname="Santesson"/>
+    <date month="August" year="2007"/>
+    <abstract>
+      <t>This document defines a new name form for inclusion in the otherName field of an X.509 Subject Alternative Name extension that allows a certificate subject to be associated with the service name and domain name components of a DNS Service Resource Record. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="4985"/>
+  <seriesInfo name="DOI" value="10.17487/RFC4985"/>
+</reference>
+      <reference anchor="RFC6125" target="https://www.rfc-editor.org/info/rfc6125">
+  <front>
+    <title>Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)</title>
+    <author fullname="P. Saint-Andre" initials="P." surname="Saint-Andre"/>
+    <author fullname="J. Hodges" initials="J." surname="Hodges"/>
+    <date month="March" year="2011"/>
+    <abstract>
+      <t>Many application technologies enable secure communication between two entities by means of Internet Public Key Infrastructure Using X.509 (PKIX) certificates in the context of Transport Layer Security (TLS).  This document specifies procedures for representing and verifying the identity of application services in such interactions. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="6125"/>
+  <seriesInfo name="DOI" value="10.17487/RFC6125"/>
+</reference>
+      <reference anchor="RFC8259" target="https://www.rfc-editor.org/info/rfc8259">
+  <front>
+    <title>The JavaScript Object Notation (JSON) Data Interchange Format</title>
+    <author fullname="T. Bray" initials="T." role="editor" surname="Bray"/>
+    <date month="December" year="2017"/>
+    <abstract>
+      <t>JavaScript Object Notation (JSON) is a lightweight, text-based, language-independent data interchange format. It was derived from the ECMAScript Programming Language Standard. JSON defines a small set of formatting rules for the portable representation of structured data.</t>
+      <t>This document removes inconsistencies with other specifications of JSON, repairs specification errors, and offers experience-based interoperability guidance.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="STD" value="90"/>
+  <seriesInfo name="RFC" value="8259"/>
+  <seriesInfo name="DOI" value="10.17487/RFC8259"/>
+</reference>
+    </references>
+    <references title="Informative References">
+      <reference anchor="RFC3232" target="https://www.rfc-editor.org/info/rfc3232">
+  <front>
+    <title>Assigned Numbers: RFC 1700 is Replaced by an On-line Database</title>
+    <author fullname="J. Reynolds" initials="J." role="editor" surname="Reynolds"/>
+    <date month="January" year="2002"/>
+    <abstract>
+      <t>This memo obsoletes RFC 1700 (STD 2) "Assigned Numbers", which contained an October 1994 snapshot of assigned Internet protocol parameters.  This memo provides information for the Internet community.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="3232"/>
+  <seriesInfo name="DOI" value="10.17487/RFC3232"/>
+</reference>
+      <reference anchor="RFC2045" target="https://www.rfc-editor.org/info/rfc2045">
+  <front>
+    <title>Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies</title>
+    <author fullname="N. Freed" initials="N." surname="Freed"/>
+    <author fullname="N. Borenstein" initials="N." surname="Borenstein"/>
+    <date month="November" year="1996"/>
+    <abstract>
+      <t>This initial document specifies the various headers used to describe the structure of MIME messages. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="2045"/>
+  <seriesInfo name="DOI" value="10.17487/RFC2045"/>
+</reference>
+      <reference anchor="RFC2046" target="https://www.rfc-editor.org/info/rfc2046">
+  <front>
+    <title>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</title>
+    <author fullname="N. Freed" initials="N." surname="Freed"/>
+    <author fullname="N. Borenstein" initials="N." surname="Borenstein"/>
+    <date month="November" year="1996"/>
+    <abstract>
+      <t>This second document defines the general structure of the MIME media typing system and defines an initial set of media types. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="2046"/>
+  <seriesInfo name="DOI" value="10.17487/RFC2046"/>
+</reference>
+      <reference anchor="RFC2782" target="https://www.rfc-editor.org/info/rfc2782">
+  <front>
+    <title>A DNS RR for specifying the location of services (DNS SRV)</title>
+    <author fullname="A. Gulbrandsen" initials="A." surname="Gulbrandsen"/>
+    <author fullname="P. Vixie" initials="P." surname="Vixie"/>
+    <author fullname="L. Esibov" initials="L." surname="Esibov"/>
+    <date month="February" year="2000"/>
+    <abstract>
+      <t>This document describes a DNS RR which specifies the location of the server(s) for a specific protocol and domain. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="2782"/>
+  <seriesInfo name="DOI" value="10.17487/RFC2782"/>
+</reference>
+      <reference anchor="RFC7301" target="https://www.rfc-editor.org/info/rfc7301">
+  <front>
+    <title>Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension</title>
+    <author fullname="S. Friedl" initials="S." surname="Friedl"/>
+    <author fullname="A. Popov" initials="A." surname="Popov"/>
+    <author fullname="A. Langley" initials="A." surname="Langley"/>
+    <author fullname="E. Stephan" initials="E." surname="Stephan"/>
+    <date month="July" year="2014"/>
+    <abstract>
+      <t>This document describes a Transport Layer Security (TLS) extension for application-layer protocol negotiation within the TLS handshake.  For instances in which multiple application protocols are supported on the same TCP or UDP port, this extension allows the application layer to negotiate which protocol will be used within the TLS connection.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="7301"/>
+  <seriesInfo name="DOI" value="10.17487/RFC7301"/>
+</reference>
+      <reference anchor="RFC7457" target="https://www.rfc-editor.org/info/rfc7457">
+  <front>
+    <title>Summarizing Known Attacks on Transport Layer Security (TLS) and Datagram TLS (DTLS)</title>
+    <author fullname="Y. Sheffer" initials="Y." surname="Sheffer"/>
+    <author fullname="R. Holz" initials="R." surname="Holz"/>
+    <author fullname="P. Saint-Andre" initials="P." surname="Saint-Andre"/>
+    <date month="February" year="2015"/>
+    <abstract>
+      <t>Over the last few years, there have been several serious attacks on Transport Layer Security (TLS), including attacks on its most commonly used ciphers and modes of operation.  This document summarizes these attacks, with the goal of motivating generic and protocol-specific recommendations on the usage of TLS and Datagram TLS (DTLS).</t>
+    </abstract>
+  </front>
+  <seriesInfo name="RFC" value="7457"/>
+  <seriesInfo name="DOI" value="10.17487/RFC7457"/>
+</reference>
+      <referencegroup anchor="BCP56" target="">
+        <reference anchor="RFC9205" target="https://www.rfc-editor.org/info/rfc9205">
+  <front>
+    <title>Building Protocols with HTTP</title>
+    <author fullname="M. Nottingham" initials="M." surname="Nottingham"/>
+    <date month="June" year="2022"/>
+    <abstract>
+      <t>Applications often use HTTP as a substrate to create HTTP-based APIs. This document specifies best practices for writing specifications that use HTTP to define new application protocols. It is written primarily to guide IETF efforts to define application protocols using HTTP for deployment on the Internet but might be applicable in other situations.</t>
+      <t>This document obsoletes RFC 3205.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="BCP" value="56"/>
+  <seriesInfo name="RFC" value="9205"/>
+  <seriesInfo name="DOI" value="10.17487/RFC9205"/>
+</reference>
+      </referencegroup>
+      <referencegroup anchor="BCP195" target="">
+        <reference anchor="RFC7525" target="https://www.rfc-editor.org/info/rfc7525">
+  <front>
+    <title>Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)</title>
+    <author fullname="Y. Sheffer" initials="Y." surname="Sheffer"/>
+    <author fullname="R. Holz" initials="R." surname="Holz"/>
+    <author fullname="P. Saint-Andre" initials="P." surname="Saint-Andre"/>
+    <date month="May" year="2015"/>
+    <abstract>
+      <t>Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) are widely used to protect data exchanged over application protocols such as HTTP, SMTP, IMAP, POP, SIP, and XMPP.  Over the last few years, several serious attacks on TLS have emerged, including attacks on its most commonly used cipher suites and their modes of operation.  This document provides recommendations for improving the security of deployed services that use TLS and DTLS.  The recommendations are applicable to the majority of use cases.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="BCP" value="195"/>
+  <seriesInfo name="RFC" value="7525"/>
+  <seriesInfo name="DOI" value="10.17487/RFC7525"/>
+</reference>
+        <reference anchor="RFC8996" target="https://www.rfc-editor.org/info/rfc8996">
+  <front>
+    <title>Deprecating TLS 1.0 and TLS 1.1</title>
+    <author fullname="K. Moriarty" initials="K." surname="Moriarty"/>
+    <author fullname="S. Farrell" initials="S." surname="Farrell"/>
+    <date month="March" year="2021"/>
+    <abstract>
+      <t>This document formally deprecates Transport Layer Security (TLS) versions 1.0 (RFC 2246) and 1.1 (RFC 4346). Accordingly, those documents have been moved to Historic status. These versions lack support for current and recommended cryptographic algorithms and mechanisms, and various government and industry profiles of applications using TLS now mandate avoiding these old TLS versions. TLS version 1.2 became the recommended version for IETF protocols in 2008 (subsequently being obsoleted by TLS version 1.3 in 2018), providing sufficient time to transition away from older versions. Removing support for older versions from implementations reduces the attack surface, reduces opportunity for misconfiguration, and streamlines library and product maintenance.</t>
+      <t>This document also deprecates Datagram TLS (DTLS) version 1.0 (RFC 4347) but not DTLS version 1.2, and there is no DTLS version 1.1.</t>
+      <t>This document updates many RFCs that normatively refer to TLS version 1.0 or TLS version 1.1, as described herein. This document also updates the best practices for TLS usage in RFC 7525; hence, it is part of BCP 195.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="BCP" value="195"/>
+  <seriesInfo name="RFC" value="8996"/>
+  <seriesInfo name="DOI" value="10.17487/RFC8996"/>
+</reference>
+      </referencegroup>
+    </references>
+    <section anchor="appendix-http-codes">
+      <name>HTTP Result Codes</name>
+      <t>The following table MAY be used as general guidance by IDMEFv2 systems acting
+            as HTTP servers when mapping various error conditions to an appropriate HTTP
+            result code.</t>
+      <t>Result codes other than the ones listed below MAY still be used,
+            so long as their semantics match the requirements set in <xref target="protocol"/>.</t>
+      <table><name>Mapping error conditions to HTTP result codes</name>
+            
+            <thead>
+                    <tr>
+                        <th>
+                            <t>Error condition</t>
+                        </th>
+                        <th>
+                            <t>HTTP result code</t>
+                        </th>
+                    </tr>
+                </thead><tbody>
+                    <tr>
+                        <td>
+                            <t>No error</t>
+                        </td>
+                        <td>
+                            <t>2xx, usually 200 (OK) or 204 (No content)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Malformed HTTP request (e.g. the HTTP request's body is not a valid
+                                IDMEFv2 message)</t>
+                        </td>
+                        <td>
+                            <t>400 (Bad request)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Unauthorized request (e.g. a request from an unauthorized IP address)</t>
+                        </td>
+                        <td>
+                            <t>403 (Forbidden)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>The HTTP request uses a method other than 'POST'</t>
+                        </td>
+                        <td>
+                            <t>405 (Method Not Allowed). In addition, the "Allow" HTTP response header
+                                MUST be set accordingly when this code is used.</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Failure to negotiate the response's media type based on the "Accept"
+                                HTTP request header.</t>
+                        </td>
+                        <td>
+                            <t>406 (Not Acceptable)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Missing "Content-Length" request header in case the implementation
+                                does not support the chunked transfer encoding</t>
+                        </td>
+                        <td>
+                            <t>411 (Length required), but please note that conforming implementations
+                                are REQUIRED to support the chunked transfer encoding</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Exceedingly long IDMEFv2 message (e.g. the message is considered
+                                to be too big due to size restrictions applied by an administrator)</t>
+                        </td>
+                        <td>
+                            <t>413 (Request entity too large)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Unsupported serialization format</t>
+                        </td>
+                        <td>
+                            <t>415 (Unsupported media type)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Internal server error</t>
+                        </td>
+                        <td>
+                            <t>500 (Internal server error)</t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <t>Unavailable service (e.g. the IDMEFv2 system is overloaded
+                                or the next processing service is unavailable)</t>
+                        </td>
+                        <td>
+                            <t>503 (Service unavailable)</t>
+                        </td>
+                    </tr>
+                </tbody>
+        </table>
+    </section>
+    <section>
+      <name>Transmission examples</name>
+      <t>In the examples below, "&gt;" denotes a request sent by the IDMEFv2 system
+            acting as an HTTP client to an IDMEFv2 system acting as an HTTP server,
+            while "&lt;" denotes a response to such requests.</t>
+      <section>
+        <name>Acknowledged IDMEFv2 message</name>
+        <t>In this example, the IDMEFv2 system acting as an HTTP server acknowledges
+                the message sent by an IDMEFv2 system acting as an HTTP client.
+                Because the HTTP server does not wish to send any content back to the client,
+                it replies with HTTP result code 204 (No content), and both the "Content-Type"
+                and "Content-Length" headers are omitted from the response.</t>
+        <sourcecode type="none">&gt; POST / HTTP/1.1\r\n
+&gt; Host: idmefv2.example.com:TBD\r\n
+&gt; Content-Type: application/json\r\n
+&gt; Content-Length: 1234\r\n
+&gt; Accept: application/json
+&gt; \r\n
+&gt; {"Version": "..."}
+
+&lt; 204 No content\r\n
+&lt; Connection: close\r\n
+&lt; \r\n</sourcecode>
+      </section>
+      <section>
+        <name>Unsupported serialization format</name>
+        <t>The following example illustrates the situation where an IDMEFv2 system acting
+                as an HTTP client tries to send a message using a serialization format (media type)
+                that is either not recognized or not supported by the IDMEFv2 system acting
+                as an HTTP server.</t>
+        <sourcecode type="none">&gt; POST / HTTP/1.1\r\n
+&gt; Host: idmefv2.example.com:TBD\r\n
+&gt; Content-Type: application/x-idmefv2\r\n
+&gt; Content-Length: 1234\r\n
+&gt; Accept: application/json
+&gt; \r\n
+&gt; ...
+
+&lt; 415 Unsupported media type\r\n
+&lt; Connection: close\r\n
+&lt; Content-Type: application/json\r\n
+&lt; Content-Length: 61\r\n
+&lt; \r\n
+&lt; {"error": "Unsupported or unrecognized serialization format"}</sourcecode>
+      </section>
+      <section>
+        <name>Content negotiation failure</name>
+        <t>In this example, the IDMEFv2 system acting as an HTTP client sends
+                an IDMEFv2 message and requests that the server reponds using the
+                "application/x-example-type" media type.</t>
+        <t>Since the server wishes to include details in the HTTP response
+                but does not know how to generate a response using that media type,
+                it sends back a page using HTTP result code 406 (Not acceptable).</t>
+        <t>The response's body may contain additional information about the media
+                types the server is willing to use and the client may try to resend
+                the request using one of the alternative media types presented inside
+                the new HTTP request's "Accept" header.</t>
+        <sourcecode type="none">&gt; POST / HTTP/1.1\r\n
+&gt; Host: idmefv2.example.com:TBD\r\n
+&gt; Content-Type: application/json\r\n
+&gt; Content-Length: 1234\r\n
+&gt; Accept: application/x-example-type
+&gt; \r\n
+&gt; ...
+
+&lt; 406 Not Acceptable\r\n
+&lt; Connection: close\r\n
+&lt; Content-Type: application/json\r\n
+&lt; Content-Length: 111\r\n
+&lt; \r\n
+&lt; {"error": "Cannot reply using 'application/x-example-type'
+  media type",\n"alternatives": ["application/json"]}\n</sourcecode>
+      </section>
+    </section>
+  </back>
+</rfc>

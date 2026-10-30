@@ -4,14 +4,14 @@
 
 Network Working Group                                         G. Lehmann
 Internet-Draft                                         Telecom Sud Paris
-Obsoletes: 4767 (if approved)                          27 September 2025
+Obsoletes: 4767 (if approved)                          27 September 2026
 Intended status: Standards Track                                        
-Expires: 31 March 2026
+Expires: 31 March 2027
 
 
    Transport of Incident Detection Message Exchange Format version 2
                      (IDMEFv2) Messages over HTTPS
-                draft-lehmann-idmefv2-https-transport-05
+                draft-lehmann-idmefv2-https-transport-07
 
 Abstract
 
@@ -19,8 +19,8 @@ Abstract
    defines a data representation for security incidents detected on
    cyber and/or physical infrastructures.
 
-   This draft is maintained the IDMEFv2 Task Force.  Please consult our
-   website for more information. https://www.idmefv2.org
+   This draft is maintained by the IDMEFv2 Task Force.  Please consult
+   our website for more information. https://www.idmefv2.org
 
    The format is agnostic so it can be used in standalone or combined
    cyber (SIEM), physical (PSIM) and availability (NMS) monitoring
@@ -53,16 +53,16 @@ Status of This Memo
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 1]
+Lehmann                   Expires 31 March 2027                 [Page 1]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
-   This Internet-Draft will expire on 31 March 2026.
+   This Internet-Draft will expire on 31 March 2027.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -92,7 +92,7 @@ Table of Contents
        4.5.4.  Certificate validation  . . . . . . . . . . . . . . .   7
        4.5.5.  PKI integration and certificate issuance  . . . . . .   8
      4.6.  Locating the HTTPS endpoint using DNS . . . . . . . . . .   9
-   5.  The JavaScript Object Notation Serialization Method . . . . .  10
+   5.  JavaScript Object Notation Serialization Method . . . . . . .  10
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
    8.  Acknowledgement . . . . . . . . . . . . . . . . . . . . . . .  12
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 2]
+Lehmann                   Expires 31 March 2027                 [Page 2]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
 1.  Introduction
@@ -138,7 +138,7 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
    Layer Security, a.k.a. [RFC9110].
 
    This document describes a serialization method for IDMEF messages
-   based on the [RFC8259].
+   based on [RFC8259].
 
 2.  Terminology
 
@@ -165,9 +165,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 3]
+Lehmann                   Expires 31 March 2027                 [Page 3]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    [BCP56] contains a number of important considerations when using HTTP
@@ -213,7 +213,7 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
    The implementations MUST implement all REQUIRED functionality for
    [RFC9112].  The implementations SHOULD implement all REQUIRED
    functionality for [RFC9113] in a TLS context.  In particular, the
-   implementations SHOULD support HTTP/2 protocol negociation using the
+   implementations SHOULD support HTTP/2 protocol negotiation using the
    [RFC7301] as defined in [RFC9113] ch 3.3.  The "h2c" protocol
    (HTTP/2.0 over cleartext) MUST NOT be used.  HTTP over TLS (also
    known as HTTPS) is specified in [RFC9110] ch 2.
@@ -221,9 +221,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 4]
+Lehmann                   Expires 31 March 2027                 [Page 4]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    Each IDMEFv2 message MUST be sent as a separate HTTP Request.
@@ -277,9 +277,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 5]
+Lehmann                   Expires 31 March 2027                 [Page 5]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    If an IDMEFv2 system receives an improper IDMEFv2 message in an HTTP
@@ -333,9 +333,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 6]
+Lehmann                   Expires 31 March 2027                 [Page 6]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    IDMEFv2 systems MUST NOT request, offer, or use any version of SSL,
@@ -389,9 +389,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 7]
+Lehmann                   Expires 31 March 2027                 [Page 7]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    *  IDMEFv2 systems MAY apply additional security measures such as IP
@@ -445,9 +445,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 8]
+Lehmann                   Expires 31 March 2027                 [Page 8]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    Great care must be taken by administrators when selecting the PKI to
@@ -501,12 +501,12 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                 [Page 9]
+Lehmann                   Expires 31 March 2027                 [Page 9]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
-5.  The JavaScript Object Notation Serialization Method
+5.  JavaScript Object Notation Serialization Method
 
    This serialization method aims to convert IDMEFv2 messages to a
    format that is easy to parse and process, both by software/hardware
@@ -557,16 +557,16 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 10]
+Lehmann                   Expires 31 March 2027                [Page 10]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
 6.  Security Considerations
 
    Most of the content in Section 4 deals with security considerations.
    Great care has been taken to protect the confidentiality,
-   authentification and integrity of IDMEFv2 messages while in transit.
+   authentication and integrity of IDMEFv2 messages while in transit.
 
    In addition, to the requirements set in Section 4, all security
    considerations of related documents apply, especially the Incident
@@ -591,7 +591,7 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
    IDMEFv2 systems MAY implement additional security measures (e.g.
    confidentiality and integrity of specific data inside the message at
-   the field's level).  Such additions SHOULD be designed with
+   the field level).  Such additions SHOULD be designed with
    interoperability in mind, so that implementations that do not
    recognize these extensions can still process IDMEFv2 messages in a
    reasonable manner without degrading the security provided by these
@@ -613,9 +613,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 11]
+Lehmann                   Expires 31 March 2027                [Page 11]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    *  Service Name: IDMEFv2
@@ -653,7 +653,7 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
    [RFC-DEV-IDMEFv2]
               Lehmann, G., "The Incident Detection Message Exchange
               Format (IDMEF) version 2", Work in Progress, Internet-
-              Draft, draft-lehmann-idmefv2-01, 27 September 2025,
+              Draft, draft-lehmann-idmefv2-01, 27 September 2026,
               <https://github.com/IDMEFv2/>.
 
    [RFC9112]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
@@ -669,9 +669,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 12]
+Lehmann                   Expires 31 March 2027                [Page 12]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    [RFC9113]  Thomson, M., Ed. and C. Benfield, Ed., "HTTP/2", RFC 9113,
@@ -725,9 +725,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 13]
+Lehmann                   Expires 31 March 2027                [Page 13]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    [RFC2046]  Freed, N. and N. Borenstein, "Multipurpose Internet Mail
@@ -781,9 +781,9 @@ Appendix A.  HTTP Result Codes
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 14]
+Lehmann                   Expires 31 March 2027                [Page 14]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    Result codes other than the ones listed below MAY still be used, so
@@ -837,9 +837,9 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 15]
+Lehmann                   Expires 31 March 2027                [Page 15]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
       | processing service is        |                             |
@@ -893,9 +893,9 @@ B.2.  Unsupported serialization format
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 16]
+Lehmann                   Expires 31 March 2027                [Page 16]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    > POST / HTTP/1.1\r\n
@@ -949,9 +949,9 @@ Author's Address
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 17]
+Lehmann                   Expires 31 March 2027                [Page 17]
 
-Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
+Internet-Draft          IDMEFv2 - HTTPS Transport         September 2026
 
 
    Gilles Lehmann
@@ -1005,4 +1005,4 @@ Internet-Draft          IDMEFv2 - HTTPS Transport         September 2025
 
 
 
-Lehmann                   Expires 31 March 2026                [Page 18]
+Lehmann                   Expires 31 March 2027                [Page 18]
