@@ -279,7 +279,7 @@
                         "description": "Type of data captured by the sensor.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/sensorDataEnum"
+                            "$ref": "#/definitions/analyzerDataEnum"
                         }
                     },
                     "ext-Data": {
@@ -839,7 +839,31 @@
                 "Sabotage.Other",
                 "Safety.Accident",
                 "Safety.Aggression",
-                "Safety.Explosion"
+                "Safety.Explosion",
+                "Safety.Fire",
+                "Safety.Hostage",
+                "Safety.Pollution",
+                "Safety.Sexual",
+                "Safety.Other",
+                "SocialEng.Baiting",
+                "SocialEng.Phishing",
+                "SocialEng.Pretexting",
+                "SocialEng.QuidProQuo",
+                "SocialEng.Other",
+                "SupplyChain.Compromise",
+                "SupplyChain.Disruption",
+                "SupplyChain.Other",
+                "Theft.Data",
+                "Theft.Equipment",
+                "Theft.FinInfo",
+                "Theft.IP",
+                "Theft.Machinery",
+                "Theft.PII",
+                "Theft.Other",
+                "Other.Uncategorized",
+                "Other.Undetermined",
+                "Other.Test",
+                "Other.ext-value"
             ],
             "description": "Possible alert category"
         },
