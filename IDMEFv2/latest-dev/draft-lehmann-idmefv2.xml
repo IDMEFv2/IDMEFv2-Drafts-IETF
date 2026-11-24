@@ -1647,13 +1647,13 @@ Source(0).IP</sourcecode>
                 
                     <dt>Polygon</dt>
                     <dd>
-                        <t>Optional. Pollygonal incident affected area.
+                        <t>Optional. Polygonal incident affected area.
                             Whitespace-delimited list of WGS 84 'latitude,longitude' pairs. Minimum 4 pairs, first equals last</t>
                     </dd>
                 
                     <dt>Circle</dt>
                     <dd>
-                        <t>Optional. Circular incident infected area.
+                        <t>Optional. Circular incident affected area.
                             WGS 84 center point 'latitude,longitude' followed by a space and radius in kilometers</t>
                     </dd>
                 
@@ -11141,11 +11141,11 @@ are not listed in ``SignedAttributes``. Signed and verifiable test vectors
                         }
                     },
                     "Polygon": {
-                        "description": "Pollygonal incident affected area. Whitespace-delimited list of WGS 84 'latitude,longitude' pairs. Minimum 4 pairs, first equals last",
+                        "description": "Polygonal incident affected area. Whitespace-delimited list of WGS 84 'latitude,longitude' pairs. Minimum 4 pairs, first equals last",
                         "type": "string"
                     },
                     "Circle": {
-                        "description": "Circular incident infected area. WGS 84 center point 'latitude,longitude' followed by a space and radius in kilometers",
+                        "description": "Circular incident affected area. WGS 84 center point 'latitude,longitude' followed by a space and radius in kilometers",
                         "type": "string"
                     },
                     "GeoLocation": {
