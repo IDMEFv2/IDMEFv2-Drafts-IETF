@@ -2018,12 +2018,12 @@ Lehmann & Andrejak        Expires 27 April 2027                [Page 36]
 Internet-Draft                   IDMEFv2                    October 2026
 
 
-      Optional.  Pollygonal incident affected area.  Whitespace-
+      Optional.  Polygonal incident affected area.  Whitespace-
       delimited list of WGS 84 'latitude,longitude' pairs.  Minimum 4
       pairs, first equals last
 
    Circle
-      Optional.  Circular incident infected area.  WGS 84 center point
+      Optional.  Circular incident affected area.  WGS 84 center point
       'latitude,longitude' followed by a space and radius in kilometers
 
    GeoLocation
@@ -9437,11 +9437,11 @@ Internet-Draft                   IDMEFv2                    October 2026
                            }
                        },
                        "Polygon": {
-                           "description": "Pollygonal incident affected area. Whitespace-delimited list of WGS 84 'latitude,longitude' pairs. Minimum 4 pairs, first equals last",
+                           "description": "Polygonal incident affected area. Whitespace-delimited list of WGS 84 'latitude,longitude' pairs. Minimum 4 pairs, first equals last",
                            "type": "string"
                        },
                        "Circle": {
-                           "description": "Circular incident infected area. WGS 84 center point 'latitude,longitude' followed by a space and radius in kilometers",
+                           "description": "Circular incident affected area. WGS 84 center point 'latitude,longitude' followed by a space and radius in kilometers",
                            "type": "string"
                        },
                        "GeoLocation": {
